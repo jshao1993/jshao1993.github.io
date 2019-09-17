@@ -8,9 +8,9 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
-      </el-button>
+      </el-button> -->
     </div>
 
     <el-table
@@ -38,7 +38,7 @@
           <span>{{ scope.row.number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="会员卡类型" width="170px" align="center">
+      <!-- <el-table-column label="会员卡类型" width="170px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.type }}</span>
         </template>
@@ -62,7 +62,7 @@
         <template slot-scope="scope">
           <el-switch v-model="scope.row.status" active-color="#13ce66" active-text="启用" inactive-text="停卡" @change="handleStatusChange" />
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <!-- <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
         <template slot-scope="scope">
           <span style="color:red;">{{ scope.row.reviewer }}</span>
@@ -88,9 +88,9 @@
       </el-table-column> -->
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <!-- <el-button type="primary" size="mini" @click="handleUpdate(row)">
             设置
-          </el-button>
+          </el-button> -->
           <!-- <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
             Publish
           </el-button>

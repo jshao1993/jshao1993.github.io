@@ -1,10 +1,43 @@
+<!--
+ * @Descripttion:
+ * @version:
+ * @Author: zhanghao
+ * @Date: 2019-10-11 16:17:56
+ * @LastEditors: sueRimn
+ * @LastEditTime: 2019-10-28 22:39:22
+ -->
 <template>
   <div class="login-container">
+    <background />
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">X-微卡</h3>
       </div>
+
+      <!-- <template>
+          <div class="input-autofill">
+              <el-input
+                ref="username"
+                v-model="loginForm.username"
+                placeholder="请输入用户名"
+                name="username"
+                type="text"
+                tabindex="1"
+                autocomplete="off"
+              />
+              <el-input
+                :key="passwordType"
+                ref="password"
+                v-model="loginForm.password"
+                :type="passwordType"
+                placeholder="请输入密码"
+                name="password"
+                tabindex="2"
+                autocomplete="off"
+              />
+          </div>
+        </template> -->
 
       <el-form-item prop="username">
         <span class="svg-container">
@@ -13,11 +46,13 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="请输入用户名"
           name="username"
           type="text"
           tabindex="1"
-          autocomplete="on"
+          :readonly="inputReadonly"
+          autocomplete="off"
+          @focus="inputFocus"
         />
       </el-form-item>
 
@@ -31,10 +66,12 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            placeholder="请输入密码"
             name="password"
             tabindex="2"
-            autocomplete="on"
+            :readonly="inputReadonly"
+            autocomplete="off"
+            @focus="inputFocus"
             @keyup.native="checkCapslock"
             @blur="capsTooltip = false"
             @keyup.enter.native="handleLogin"
@@ -45,9 +82,9 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登 陆</el-button>
 
-      <div style="position:relative">
+      <!-- <div style="position:relative">
         <div class="tips">
           <span>Username : admin</span>
           <span>Password : any</span>
@@ -60,37 +97,39 @@
         <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
           Or connect with
         </el-button>
-      </div>
+      </div> -->
     </el-form>
 
-    <el-dialog title="Or connect with" :visible.sync="showDialog">
+    <!-- <el-dialog title="Or connect with" :visible.sync="showDialog">
       Can not be simulated on local, so please combine you own business simulation! ! !
       <br>
       <br>
       <br>
       <social-sign />
-    </el-dialog>
+    </el-dialog> -->
+    <p />
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
-import SocialSign from './components/SocialSignin'
+// import SocialSign from './components/SocialSignin'
+import Background from './components/Background'
 
 export default {
   name: 'Login',
-  components: { SocialSign },
+  components: { Background },
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('请输入正确的用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码不能少于6位'))
       } else {
         callback()
       }
@@ -109,7 +148,8 @@ export default {
       loading: false,
       showDialog: false,
       redirect: undefined,
-      otherQuery: {}
+      otherQuery: {},
+      inputReadonly: true
     }
   },
   watch: {
@@ -185,6 +225,9 @@ export default {
         }
         return acc
       }, {})
+    },
+    inputFocus() {
+      this.inputReadonly = false
     }
     // afterQRScan() {
     //   if (e.key === 'x-admin-oauth-code') {
@@ -246,6 +289,11 @@ $cursor: #fff;
     }
   }
 
+  .input-autofill {
+    position: absolute;
+    left: -9999px;
+  }
+
   .el-form-item {
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.1);
@@ -259,18 +307,19 @@ $cursor: #fff;
 $bg:#2d3a4b;
 $dark_gray:#889aa4;
 $light_gray:#eee;
+$light_black: #000;
 
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-color: $bg;
+  background: #f7fafc;
   overflow: hidden;
 
   .login-form {
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 0;
+    padding: 200px 35px 0;
     margin: 0 auto;
     overflow: hidden;
   }
@@ -299,11 +348,15 @@ $light_gray:#eee;
     position: relative;
 
     .title {
-      font-size: 26px;
-      color: $light_gray;
+      // font-size: 34px;
+      color: #fff;
       margin: 0px auto 40px auto;
       text-align: center;
-      font-weight: bold;
+      // font-weight: bold;
+      font-size: 52px;
+      font-family: Teko,sans-serif;
+      text-shadow: 8px 8px #000;
+      text-transform: uppercase;
     }
   }
 

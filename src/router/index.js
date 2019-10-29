@@ -76,6 +76,7 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
+    hidden: false,
     children: [
       {
         path: 'dashboard',
@@ -84,19 +85,95 @@ export const constantRoutes = [
         meta: { title: '主页', icon: 'dashboard', affix: true }
       }
     ]
+  },
+  {
+    path: '/documentation',
+    component: Layout,
+    meta: { title: '消费', icon: 'dashboard' },
+    redirect: '/documentation/consume',
+    children: [
+      {
+        path: 'consume',
+        component: () => import('@/views/documentation/card-consume/index'),
+        name: 'Documentation',
+        meta: { title: '会员卡消费', icon: 'documentation', affix: true }
+      },
+      {
+        path: 'records',
+        component: () => import('@/views/documentation/consume-records/index'),
+        name: 'Documentation',
+        meta: { title: '消费记录', icon: 'documentation', affix: true }
+      }
+    ]
+  },
+  {
+    path: '/coupon',
+    component: Layout,
+    meta: { title: '优惠券', icon: 'dashboard' },
+    redirect: '/coupon/list',
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/coupon/index'),
+        name: 'Documentation',
+        meta: { title: '优惠券配置', icon: 'documentation', affix: true }
+      }
+    ]
+  },
+  {
+    path: '/member',
+    component: Layout,
+    meta: { title: '会员管理', icon: 'dashboard' },
+    redirect: '/member/list',
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/member/index'),
+        name: 'Documentation',
+        meta: { title: '会员管理', icon: 'documentation', affix: true }
+      }
+    ]
+  },
+  {
+    path: '/merchant',
+    component: Layout,
+    meta: { title: '商家管理', icon: 'dashboard' },
+    redirect: '/merchant/list',
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/views/merchant/index'),
+        name: 'Documentation',
+        meta: { title: '商家管理', icon: 'documentation', affix: true }
+      }
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    meta: { title: '系统设置', icon: 'guide' },
+    redirect: '/system/store',
+    children: [
+      {
+        path: 'store',
+        component: () => import('@/views/system/store'),
+        name: 'Documentation',
+        meta: { title: '店面设置', icon: 'documentation', affix: true }
+      },
+      {
+        path: 'assistant ',
+        component: () => import('@/views/system/assistant'),
+        name: 'Documentation',
+        meta: { title: '店员管理', icon: 'documentation', affix: true }
+      },
+      {
+        path: 'journal ',
+        component: () => import('@/views/system/journal'),
+        name: 'Documentation',
+        meta: { title: '店铺日志', icon: 'documentation', affix: true }
+      }
+    ]
   }
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/documentation/index'),
-  //       name: 'Documentation',
-  //       meta: { title: 'Documentation', icon: 'documentation', affix: true }
-  //     }
-  //   ]
-  // },
   // {
   //   path: '/guide',
   //   component: Layout,

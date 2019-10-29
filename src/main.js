@@ -1,5 +1,7 @@
 import Vue from 'vue'
 
+import VueParticles from 'vue-particles'
+
 import Cookies from 'js-cookie'
 
 import 'normalize.css/normalize.css' // a modern alternative to CSS resets
@@ -35,6 +37,8 @@ if (process.env.NODE_ENV === 'production') {
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size
 })
+
+Vue.use(VueParticles)
 
 // register global utility filters
 Object.keys(filters).forEach(key => {

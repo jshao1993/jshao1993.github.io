@@ -70,6 +70,10 @@ export default {
       }
     }
   },
+  created() {
+    this.fixedHeader = true
+    this.sidebarLogo = true
+  },
   methods: {
     themeChange(val) {
       this.$store.dispatch('settings/changeSetting', {

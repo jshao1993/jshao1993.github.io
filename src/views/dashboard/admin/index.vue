@@ -1,24 +1,43 @@
 <template>
   <div class="dashboard-editor-container">
-    <!-- <github-corner class="github-corner" /> -->
-
-    <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
     <el-row style="background:#fff;padding:4px 16px 0;margin-bottom:32px;">
-      <h3 class="title">会员卡分析</h3>
-      <line-chart-panel :data-list="cardsData" />
-      <line-chart :chart-data="lineChartData" />
-      <line-chart-panel :data-list="payData" />
+      <h3 class="title">销售统计</h3>
+      <span>选择时间：</span>
+      <el-date-picker
+        v-model="totalTime"
+        type="daterange"
+        align="right"
+        unlink-panels
+        prefix-icon="el-icon-date"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :picker-options="pickerOptions"
+      />
+
+      <panel-group @handleSetLineChartData="handleSetLineChartData" />
+
+    </el-row>
+
+    <el-row style="background:#fff;padding:4px 16px 0;margin-bottom:32px;">
+      <h3 class="title">消费金额</h3>
       <line-chart :chart-data="lineChartData" />
     </el-row>
 
-    <el-row :gutter="32">
-      <!-- <el-col :xs="24" :sm="24" :lg="8">
+    <el-row style="background:#fff;padding:4px 16px 0;margin-bottom:32px;">
+      <h3 class="title">会员统计</h3>
+      <line-chart-panel :data-list="cardsData" />
+      <line-chart-panel :data-list="payData" />
+    </el-row>
+
+    <!-- <el-row :gutter="32">
+      <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
           <h3 class="title">会员卡分析</h3>
           <raddar-chart />
         </div>
-      </el-col> -->
+      </el-col>
       <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
           <h3 class="title">入场时段分析</h3>
@@ -31,7 +50,7 @@
           <bar-chart />
         </div>
       </el-col>
-    </el-row>
+    </el-row> -->
 
     <!-- <el-row :gutter="8">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
@@ -53,8 +72,8 @@ import PanelGroup from './components/PanelGroup'
 import LineChart from './components/LineChart'
 import LineChartPanel from './components/LineChartPanel'
 // import RaddarChart from './components/RaddarChart'
-import PieChart from './components/PieChart'
-import BarChart from './components/BarChart'
+// import PieChart from './components/PieChart'
+// import BarChart from './components/BarChart'
 // import TransactionTable from './components/TransactionTable'
 // import TodoList from './components/TodoList'
 // import BoxCard from './components/BoxCard'
@@ -80,15 +99,15 @@ const lineChartData = {
 
 const dataList = {
   cardsData: [
-    { text: '办卡', value: 1820, color: '#d87a80' },
-    { text: '续费', value: 230, color: '#5ab1ef' },
-    { text: '充次', value: 3082, color: '#e5995c' },
-    { text: '升级', value: 23520, color: '#82c92e' }
+    { text: '当前会员数', value: 1234, color: '#d87a80' },
+    { text: '会员卡发放量', value: 6000, color: '#5ab1ef' },
+    { text: '优惠券发放量', value: 800, color: '#e5995c' },
+    { text: '三月内活跃会员数', value: 800, color: '#82c92e' }
   ],
   payData: [
-    { text: '平均单价(元)', value: 1200, color: '#2ec7c9' },
-    { text: '总销售额(元)', value: 523000, color: '#b6a2de' },
-    { text: '总会员数(个)', value: 2500, color: '#eb82bd' }
+    { text: '会员总充值金额', value: 126560, color: '#2ec7c9' },
+    { text: '会员总消费金额', value: 6560, color: '#b6a2de' },
+    { text: '会员剩余金额', value: 800, color: '#eb82bd' }
   ]
 }
 
@@ -98,10 +117,10 @@ export default {
     // GithubCorner,
     PanelGroup,
     LineChart,
-    LineChartPanel,
+    LineChartPanel
     // RaddarChart,
-    PieChart,
-    BarChart
+    // PieChart,
+    // BarChart
     // TransactionTable,
     // TodoList,
     // BoxCard
@@ -110,7 +129,35 @@ export default {
     return {
       lineChartData: lineChartData.newVisitis,
       cardsData: dataList.cardsData,
-      payData: dataList.payData
+      payData: dataList.payData,
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
+          }
+        }]
+      },
+      totalTime: ''
     }
   },
   methods: {

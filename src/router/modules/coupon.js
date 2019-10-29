@@ -1,9 +1,9 @@
 import Layout from '@/layout'
 
 const cardsRouter = {
-  path: '/coupon',
+  path: '/couponer',
   component: Layout,
-  redirect: '/coupon/list',
+  redirect: '/couponer/list',
   name: 'Coupons',
   meta: {
     title: '优惠券',

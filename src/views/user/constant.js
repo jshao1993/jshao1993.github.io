@@ -6,5 +6,6 @@ export const listData = [{
     status: true,
     number: '330721199308127110',
     time: '2017-10-01 12：00',
-    amount: '+200'
+    rechargeAmount: '200',
+    consumeAmount: '+200'
 }]

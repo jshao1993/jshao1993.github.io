@@ -1,38 +1,33 @@
 import request from '@/utils/request'
 
-export function getRoutes() {
-  return request({
-    url: '/routes',
-    method: 'get'
-  })
-}
-
+// 获取所有角色列表
 export function getRoles() {
-  return request({
-    url: '/roles',
-    method: 'get'
-  })
+    return request({
+        url: '/v1/role/list',
+        method: 'get'
+    })
 }
 
+// 新建自定义角色
 export function addRole(data) {
-  return request({
-    url: '/role',
-    method: 'post',
-    data
-  })
+    return request({
+        url: '/v1/role',
+        method: 'post',
+        data
+    })
 }
 
 export function updateRole(id, data) {
-  return request({
-    url: `/role/${id}`,
-    method: 'put',
-    data
-  })
+    return request({
+        url: `/role/${id}`,
+        method: 'put',
+        data
+    })
 }
 
 export function deleteRole(id) {
-  return request({
-    url: `/role/${id}`,
-    method: 'delete'
-  })
+    return request({
+        url: `/role/${id}`,
+        method: 'delete'
+    })
 }

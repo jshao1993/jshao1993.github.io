@@ -9,35 +9,17 @@
 <template>
   <div class="login-container">
     <background />
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
-
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+      autocomplete="on"
+      label-position="left"
+    >
       <div class="title-container">
         <h3 class="title">X-微卡</h3>
       </div>
-
-      <!-- <template>
-          <div class="input-autofill">
-              <el-input
-                ref="username"
-                v-model="loginForm.username"
-                placeholder="请输入用户名"
-                name="username"
-                type="text"
-                tabindex="1"
-                autocomplete="off"
-              />
-              <el-input
-                :key="passwordType"
-                ref="password"
-                v-model="loginForm.password"
-                :type="passwordType"
-                placeholder="请输入密码"
-                name="password"
-                tabindex="2"
-                autocomplete="off"
-              />
-          </div>
-        </template> -->
 
       <el-form-item prop="username">
         <span class="svg-container">
@@ -50,9 +32,7 @@
           name="username"
           type="text"
           tabindex="1"
-          :readonly="inputReadonly"
           autocomplete="off"
-          @focus="inputFocus"
         />
       </el-form-item>
 
@@ -61,15 +41,15 @@
           <span class="svg-container">
             <svg-icon icon-class="password" />
           </span>
+          <!-- <input type="password" name="txtPassword" style="display:none" /> -->
           <el-input
             :key="passwordType"
             ref="password"
             v-model="loginForm.password"
+            name="password"
             :type="passwordType"
             placeholder="请输入密码"
-            name="password"
             tabindex="2"
-            :readonly="inputReadonly"
             autocomplete="off"
             @focus="inputFocus"
             @keyup.native="checkCapslock"
@@ -82,31 +62,13 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登 陆</el-button>
-
-      <!-- <div style="position:relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
-        </div>
-
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button>
-      </div> -->
+      <el-button
+        :loading="loading"
+        type="primary"
+        style="width:100%;margin-bottom:30px;"
+        @click.native.prevent="handleLogin"
+      >登 陆</el-button>
     </el-form>
-
-    <!-- <el-dialog title="Or connect with" :visible.sync="showDialog">
-      Can not be simulated on local, so please combine you own business simulation! ! !
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog> -->
     <p />
   </div>
 </template>
@@ -117,118 +79,129 @@ import { validUsername } from '@/utils/validate'
 import Background from './components/Background'
 
 export default {
-  name: 'Login',
-  components: { Background },
-  data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('请输入正确的用户名'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('密码不能少于6位'))
-      } else {
-        callback()
-      }
-    }
-    return {
-      loginForm: {
-        username: 'admin',
-        password: '111111'
-      },
-      loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
-      },
-      passwordType: 'password',
-      capsTooltip: false,
-      loading: false,
-      showDialog: false,
-      redirect: undefined,
-      otherQuery: {},
-      inputReadonly: true
-    }
-  },
-  watch: {
-    $route: {
-      handler: function(route) {
-        const query = route.query
-        if (query) {
-          this.redirect = query.redirect
-          this.otherQuery = this.getOtherQuery(query)
+    name: 'Login',
+    components: { Background },
+    data() {
+        const validateUsername = (rule, value, callback) => {
+            if (!validUsername(value)) {
+                callback(new Error('请输入正确的用户名'))
+            } else {
+                callback()
+            }
         }
-      },
-      immediate: true
-    }
-  },
-  created() {
+        const validatePassword = (rule, value, callback) => {
+            if (value.length < 6) {
+                callback(new Error('密码不能少于6位'))
+            } else {
+                callback()
+            }
+        }
+        return {
+            loginForm: {
+                username: 'alice',
+                password: '86F33d#efe'
+            },
+            loginRules: {
+                username: [
+                    { required: true, trigger: 'blur', validator: validateUsername }
+                ],
+                password: [
+                    { required: true, trigger: 'blur', validator: validatePassword }
+                ]
+            },
+            passwordType: 'password',
+            capsTooltip: false,
+            loading: false,
+            showDialog: false,
+            redirect: undefined,
+            otherQuery: {}
+        }
+    },
+    watch: {
+        $route: {
+            handler: function(route) {
+                const query = route.query
+                console.log(query, 'query')
+                if (query) {
+                    this.redirect = query.redirect
+                    console.log(this.redirect, 'this.redirect')
+                    this.otherQuery = this.getOtherQuery(query)
+                    console.log(this.otherQuery, 'this.otherQuery')
+                }
+            },
+            immediate: true
+        }
+    },
+    created() {
     // window.addEventListener('storage', this.afterQRScan)
-  },
-  mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
-    } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
-    }
-  },
-  destroyed() {
+    },
+    mounted() {
+        if (this.loginForm.username === '') {
+            this.$refs.username.focus()
+        } else if (this.loginForm.password === '') {
+            this.$refs.password.focus()
+        }
+    },
+    destroyed() {
     // window.removeEventListener('storage', this.afterQRScan)
-  },
-  methods: {
-    checkCapslock({ shiftKey, key } = {}) {
-      if (key && key.length === 1) {
-        if (shiftKey && (key >= 'a' && key <= 'z') || !shiftKey && (key >= 'A' && key <= 'Z')) {
-          this.capsTooltip = true
-        } else {
-          this.capsTooltip = false
-        }
-      }
-      if (key === 'CapsLock' && this.capsTooltip === true) {
-        this.capsTooltip = false
-      }
     },
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.loading = false
+    methods: {
+        checkCapslock({ shiftKey, key } = {}) {
+            if (key && key.length === 1) {
+                if (
+                    (shiftKey && (key >= 'a' && key <= 'z')) ||
+          (!shiftKey && (key >= 'A' && key <= 'Z'))
+                ) {
+                    this.capsTooltip = true
+                } else {
+                    this.capsTooltip = false
+                }
+            }
+            if (key === 'CapsLock' && this.capsTooltip === true) {
+                this.capsTooltip = false
+            }
+        },
+        showPwd() {
+            if (this.passwordType === 'password') {
+                this.passwordType = ''
+            } else {
+                this.passwordType = 'password'
+            }
+            this.$nextTick(() => {
+                this.$refs.password.focus()
             })
-            .catch(() => {
-              this.loading = false
+        },
+        handleLogin() {
+            this.$refs.loginForm.validate(valid => {
+                if (valid) {
+                    this.loading = true
+                    this.$store
+                        .dispatch('user/login', this.loginForm)
+                        .then(() => {
+                            this.$router.push({
+                                path: this.redirect || '/',
+                                query: this.otherQuery
+                            })
+                            this.loading = false
+                        })
+                        .catch(() => {
+                            this.loading = false
+                        })
+                } else {
+                    console.log('error submit!!')
+                    return false
+                }
             })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
-    getOtherQuery(query) {
-      return Object.keys(query).reduce((acc, cur) => {
-        if (cur !== 'redirect') {
-          acc[cur] = query[cur]
-        }
-        return acc
-      }, {})
-    },
-    inputFocus() {
-      this.inputReadonly = false
-    }
+        },
+        getOtherQuery(query) {
+            return Object.keys(query).reduce((acc, cur) => {
+                if (cur !== 'redirect') {
+                    acc[cur] = query[cur]
+                }
+                return acc
+            }, {})
+        },
+        inputFocus() {}
     // afterQRScan() {
     //   if (e.key === 'x-admin-oauth-code') {
     //     const code = getQueryObject(e.newValue)
@@ -247,7 +220,7 @@ export default {
     //     }
     //   }
     // }
-  }
+    }
 }
 </script>
 
@@ -255,8 +228,8 @@ export default {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
-$light_gray:#fff;
+$bg: #283443;
+$light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -304,9 +277,9 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 $light_black: #000;
 
 .login-container {
@@ -354,7 +327,7 @@ $light_black: #000;
       text-align: center;
       // font-weight: bold;
       font-size: 52px;
-      font-family: Teko,sans-serif;
+      font-family: Teko, sans-serif;
       text-shadow: 8px 8px #000;
       text-transform: uppercase;
     }

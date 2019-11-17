@@ -16,8 +16,16 @@ const cardsRouter = {
         meta: {
             title: '会员卡列表'
         }
+    },
+    {
+        path: 'card',
+        component: () => import('@/views/cards/config'),
+        name: 'CardsConfig',
+        meta: {
+            title: '会员卡配置'
+        }
     }
-        // {
+        //  {
         //   path: 'add',
         //   component: () => import('@/views/cards/add'),
         //   name: 'addCards',

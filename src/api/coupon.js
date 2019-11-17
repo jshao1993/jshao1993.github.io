@@ -16,3 +16,20 @@ export function addCoupon(data) {
         data
     })
 }
+
+// 更新优惠券配置
+export function updateCoupon(data) {
+    return request({
+        url: '/v1/coupon/config',
+        method: 'put',
+        data
+    })
+}
+
+// 删除优惠券配置
+export function deleteCoupon(id) {
+    return request({
+        url: `/v1/coupon/config/${id}`,
+        method: 'delete'
+    })
+}

@@ -92,7 +92,6 @@ const actions = {
                 if (!authorities || authorities.length <= 0) {
                     reject('getInfo: authorities must be a non-null array!')
                 }
-
                 commit('SET_ROLES', authorities)
                 commit('SET_NAME', username)
                 commit('SET_AVATAR', avatar)

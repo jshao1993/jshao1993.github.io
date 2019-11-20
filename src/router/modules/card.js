@@ -14,7 +14,8 @@ const cardsRouter = {
         component: () => import('@/views/cards/list'),
         name: 'ListCards',
         meta: {
-            title: '会员卡列表'
+            title: '会员卡列表',
+            icon: 'skill'
         }
     },
     {
@@ -22,7 +23,8 @@ const cardsRouter = {
         component: () => import('@/views/cards/config'),
         name: 'CardsConfig',
         meta: {
-            title: '会员卡配置'
+            title: '会员卡配置',
+            icon: 'tab'
         }
     }
         //  {

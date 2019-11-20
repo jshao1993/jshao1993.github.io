@@ -6,7 +6,7 @@ export function fetchList({
     phone
 }) {
     return request({
-        url: `/v1/ms/consume/${eid}/list`,
+        url: `/v1/ms/consume/list/${eid}`,
         method: 'get',
         params: {
             phone

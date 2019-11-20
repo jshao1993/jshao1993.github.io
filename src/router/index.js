@@ -91,7 +91,7 @@ export const constantRoutes = [{
     name: 'Consume',
     meta: {
         title: '消费',
-        icon: 'dashboard'
+        icon: 'list'
     },
     redirect: '/consume/page',
     children: [{
@@ -100,7 +100,7 @@ export const constantRoutes = [{
         name: 'PageConsume',
         meta: {
             title: '会员卡消费',
-            icon: 'documentation',
+            icon: 'lock',
             affix: true
         }
     },
@@ -110,7 +110,7 @@ export const constantRoutes = [{
         name: 'RecordsConsume',
         meta: {
             title: '消费记录',
-            icon: 'documentation',
+            icon: 'money',
             affix: true
         }
     }
@@ -123,7 +123,7 @@ cardRouter,
     name: 'Coupon',
     meta: {
         title: '优惠券',
-        icon: 'dashboard'
+        icon: 'clipboard'
     },
     redirect: '/coupon/list',
     children: [{
@@ -132,7 +132,7 @@ cardRouter,
         name: 'ListCoupon',
         meta: {
             title: '优惠券配置',
-            icon: 'documentation',
+            icon: 'guide',
             affix: true
         }
     }]
@@ -163,7 +163,7 @@ cardRouter,
     name: 'Enterprise',
     meta: {
         title: '商家管理',
-        icon: 'dashboard'
+        icon: 'qq'
     },
     redirect: '/enterprise/list',
     children: [{
@@ -172,7 +172,7 @@ cardRouter,
         name: 'ListEnterprise',
         meta: {
             title: '商家管理',
-            icon: 'documentation',
+            icon: 'qq',
             affix: true
         }
     }]
@@ -182,7 +182,7 @@ cardRouter,
     component: Layout,
     meta: {
         title: '系统设置',
-        icon: 'guide'
+        icon: 'size'
     },
     redirect: '/system/store',
     children: [{
@@ -191,7 +191,7 @@ cardRouter,
         name: 'Documentation',
         meta: {
             title: '店面设置',
-            icon: 'documentation',
+            icon: 'star',
             affix: true
         }
     },
@@ -201,7 +201,7 @@ cardRouter,
         name: 'Documentation',
         meta: {
             title: '用户管理',
-            icon: 'documentation',
+            icon: 'user',
             affix: true
         }
     },
@@ -211,7 +211,7 @@ cardRouter,
         name: 'Documentation',
         meta: {
             title: '角色管理',
-            icon: 'documentation',
+            icon: 'people',
             affix: true
         }
     },
@@ -221,7 +221,7 @@ cardRouter,
         name: 'Documentation',
         meta: {
             title: '权限管理',
-            icon: 'documentation',
+            icon: 'education',
             affix: true
         }
     }

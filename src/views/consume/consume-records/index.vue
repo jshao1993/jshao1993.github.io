@@ -7,6 +7,7 @@
         clearable
         class="filter-item"
         style="width: 150px"
+        @keyup.enter.native="handleFilter"
       >
         <el-option
           v-for="item in typeOptions"
@@ -52,27 +53,6 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <!-- <el-table-column type="expand">
-                <template slot-scope="props">
-                    <el-form label-position="left" inline class="table-expand">
-                        <el-form-item label="客户姓名">
-                            <span>{{ props.row.name }}</span>
-                        </el-form-item>
-                        <el-form-item label="客户手机号">
-                            <span>{{ props.row.phone }}</span>
-                        </el-form-item>
-                        <el-form-item label="会员卡名称">
-                            <span>{{ props.row.cardName }}</span>
-                        </el-form-item>
-                        <el-form-item label="消费时间">
-                            <span>{{ props.row.time }}</span>
-                        </el-form-item>
-                        <el-form-item label="消费充值金额">
-                            <span>{{ props.row.amount }}</span>
-                        </el-form-item>
-                    </el-form>
-                </template>
-            </el-table-column> -->
       <el-table-column
         label="序号"
         prop="id"
@@ -96,7 +76,7 @@
         align="center"
       />
       <el-table-column
-        prop="customerPhon"
+        prop="customerPhone"
         label="顾客手机号"
         min-width="140px"
         align="center"
@@ -118,10 +98,16 @@
         label="消费时间"
         min-width="140px"
         align="center"
-      />
+      >
+        <template slot-scope="scope">
+          <span>{{
+            scope.row.consumeTime | parseTime("{y}-{m}-{d} {h}:{i}")
+          }}</span>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="money"
-        label="消费或充值金额"
+        label="消费或充值金额（元）"
         min-width="140px"
         align="center"
       />
@@ -130,14 +116,18 @@
         label="消费类型"
         min-width="140px"
         align="center"
-      />
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.type | typeFilter }}</span>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination
       v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :page.sync="listQuery.pageNum"
+      :limit.sync="listQuery.pageSize"
       @pagination="getList"
     />
   </div>
@@ -155,10 +145,20 @@ const typeOptions = [
     { key: 'PURCHASE', display_name: '消费' }
 ]
 
+const typeKeyValue = typeOptions.reduce((acc, cur) => {
+    acc[cur.key] = cur.display_name
+    return acc
+}, {})
+
 export default {
     name: 'ConsumeRecords',
     components: { Pagination },
     directives: { waves },
+    filters: {
+        typeFilter(type) {
+            return typeKeyValue[type]
+        }
+    },
     data() {
         return {
             tableKey: 0,
@@ -169,7 +169,7 @@ export default {
                 pageNum: 1,
                 pageSize: 20,
                 phone: undefined,
-                type: undefined
+                type: ''
             },
             typeOptions,
             temp: {
@@ -192,7 +192,6 @@ export default {
                 time: '时间会员卡类型'
             },
             dialogPvVisible: false,
-            pvData: [],
             rules: {
                 type: [
                     {
@@ -250,20 +249,17 @@ export default {
             const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
             this.listQuery.eid = ep[0].eid
             fetchList(this.listQuery).then(response => {
-                this.list = response.records
+                if (response && Array.isArray(response.records)) {
+                    this.list = response.records.filter(
+                        _ => !!~_.type.indexOf(this.listQuery.type)
+                    )
+                }
                 this.listLoading = false
             })
         },
         handleFilter() {
             this.listQuery.page = 1
             this.getList()
-        },
-        handleModifyStatus(row, status) {
-            this.$message({
-                message: '操作Success',
-                type: 'success'
-            })
-            row.status = status
         },
         sortChange(data) {
             const { prop, order } = data
@@ -279,95 +275,32 @@ export default {
             }
             this.handleFilter()
         },
-        resetTemp() {
-            this.temp = {
-                id: undefined,
-                importance: 1,
-                remark: '',
-                timestamp: new Date(),
-                title: '',
-                status: 'published',
-                type: ''
-            }
-        },
-        // createData() {
-        //     this.$refs["dataForm"].validate(valid => {
-        //         if (valid) {
-        //             this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-        //             this.temp.date = new Date();
-        //             this.temp.number = parseInt(Math.random() * 100) + 1024; // mock a number
-        //             createArticle(this.temp).then(() => {
-        //                 this.list.unshift(this.temp);
-        //                 this.dialogFormVisible = false;
-        //                 this.$notify({
-        //                     title: "Success",
-        //                     message: "新增成功",
-        //                     type: "success",
-        //                     duration: 2000
-        //                 });
-        //             });
-        //         }
-        //     });
-        // },
-        handleUpdate(row) {
-            this.temp = Object.assign({}, row) // copy obj
-            this.dialogStatus = 'update'
-            this.typeStatus =
-                this.temp.type === '充值会员卡' ? 'recharge' : 'time'
-            this.dialogFormVisible = true
-            this.$nextTick(() => {
-                this.$refs['dataForm'].clearValidate()
-            })
-        },
-        // updateData() {
-        //     this.$refs["dataForm"].validate(valid => {
-        //         if (valid) {
-        //             const tempData = Object.assign({}, this.temp);
-        //             updateArticle(tempData).then(() => {
-        //                 for (const v of this.list) {
-        //                     if (v.id === this.temp.id) {
-        //                         const index = this.list.indexOf(v);
-        //                         this.list.splice(index, 1, this.temp);
-        //                         break;
-        //                     }
-        //                 }
-        //                 this.dialogFormVisible = false;
-        //                 this.$notify({
-        //                     title: "Success",
-        //                     message: "更新成功",
-        //                     type: "success",
-        //                     duration: 2000
-        //                 });
-        //             });
-        //         }
-        //     });
-        // },
-        handleDelete(row) {
-            this.$notify({
-                title: 'Success',
-                message: '删除成功',
-                type: 'success',
-                duration: 2000
-            })
-            const index = this.list.indexOf(row)
-            this.list.splice(index, 1)
-        },
         handleDownload() {
             this.downloadLoading = true
             import('@/vendor/Export2Excel').then(excel => {
                 const tHeader = [
+                    '顾客名称',
+                    '顾客手机号',
                     '会员卡id',
-                    '办卡日期',
-                    '类型',
-                    '会员姓名',
-                    '会员手机号'
+                    '会员卡名称',
+                    '消费时间',
+                    '消费或充值金额（元）',
+                    '消费类型'
                 ]
-                const filterVal = ['date', 'type', 'number', 'name']
+                const filterVal = [
+                    'customerName',
+                    'customerPhone',
+                    'memberShipId',
+                    'memberShipName',
+                    'consumeTime',
+                    'money',
+                    'type'
+                ]
                 const data = this.formatJson(filterVal, this.list)
                 excel.export_json_to_excel({
                     header: tHeader,
                     data,
-                    filename: '会员卡列表'
+                    filename: '消费记录'
                 })
                 this.downloadLoading = false
             })
@@ -375,8 +308,10 @@ export default {
         formatJson(filterVal, jsonData) {
             return jsonData.map(v =>
                 filterVal.map(j => {
-                    if (j === 'timestamp') {
-                        return parseTime(v[j])
+                    if (j === 'consumeTime') {
+                        return parseTime(v[j], '{y}-{m}-{d} {h}:{i}')
+                    } else if (j === 'type') {
+                        return typeKeyValue[v[j]]
                     } else {
                         return v[j]
                     }
@@ -390,14 +325,6 @@ export default {
                 : sort === `-${key}`
                     ? 'descending'
                     : ''
-        },
-        handleStatusChange(newStatus) {
-            this.$notify({
-                title: 'Success',
-                message: `${newStatus ? '启用' : '停卡'}成功`,
-                type: 'success',
-                duration: 2000
-            })
         }
     }
 }

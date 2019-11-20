@@ -179,11 +179,8 @@
             placeholder="请输入会员电话"
           />
         </el-form-item>
-        <el-form-item
-          v-if="temp.type === 'CREDITED'"
-          label="充值金额"
-          prop="money"
-        >
+        <!-- v-if="temp.type === 'CREDITED'" -->
+        <el-form-item label="充值金额" prop="money">
           <el-input
             v-model="temp.money"
             clearable
@@ -211,7 +208,8 @@ import {
     addCard,
     startCard,
     stopCard,
-    updateCard
+    updateCard,
+    fetchCard
 } from '@/api/card'
 import waves from '@/directive/waves' // waves directive
 import { parseTime, deepClone } from '@/utils'
@@ -238,6 +236,19 @@ export default {
         }
     },
     data() {
+        const phoneValidate = async(rule, value, callback) => {
+            const result = await this.getCard(value)
+            const idExsist =
+                this.cardObj !== null &&
+                this.cardObj.id != null && // null or undefined
+                this.cardObj.id !== ''
+            if (idExsist && this.cardObj.customerPhone === value) {
+                return false
+            }
+            Array.isArray(result) && result.length
+                ? callback(new Error('该手机号已经存在'))
+                : callback()
+        }
         return {
             tableKey: 0,
             list: null,
@@ -294,7 +305,8 @@ export default {
                         pattern: patterns.mobile,
                         message: '请输入正确的手机号码',
                         trigger: 'blur'
-                    }
+                    },
+                    { validator: phoneValidate, trigger: 'blur' }
                 ],
                 money: [
                     {
@@ -313,7 +325,8 @@ export default {
             membercardsOptions: [],
             currentCid: '',
             creditedCideTemp: '',
-            timedCideTemp: ''
+            timedCideTemp: '',
+            cardObj: null
         }
     },
     computed: {
@@ -357,6 +370,15 @@ export default {
                 this.listLoading = false
             })
         },
+        getCard(phone) {
+            const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
+            const eid = ep[0].eid
+            return new Promise((resolve, reject) => {
+                fetchCard({ eid, phone }).then(response => {
+                    resolve(response)
+                })
+            })
+        },
         handleFilter() {
             this.listQuery.pageNum = 1
             this.getList()
@@ -371,6 +393,7 @@ export default {
             }
         },
         handleCreate() {
+            this.cardObj = null
             this.timedCideTemp = ''
             this.creditedCideTemp = ''
             this.dialogStatus = 'create'
@@ -383,12 +406,14 @@ export default {
                         _ => _.name === '李宝的店铺'
                     )
                     const temp = Object.assign({}, this.temp)
-                    if (temp.type === 'TIMED') {
-                        temp.money = 200 // 测试数据
-                    }
+                    // if (temp.type === "TIMED") {
+                    //     temp.money = 200; // 测试数据
+                    // }
                     delete temp.type
                     temp.eid = ep[0].eid
                     addCard(temp).then(response => {
+                        this.resetTemp()
+                        this.$refs['dataForm'].clearValidate()
                         this.dialogFormVisible = false
                         this.getList()
                         this.$notify({
@@ -402,6 +427,7 @@ export default {
             })
         },
         handleUpdate(row) {
+            this.cardObj = row
             this.timedCideTemp = ''
             this.creditedCideTemp = ''
             this.temp = Object.assign({}, row) // copy obj
@@ -426,8 +452,7 @@ export default {
                         this.dialogFormVisible = true
                     })
                     .catch(() => {
-                        this.$set(this.temp, 'type', 'CREDITED')
-                        this.temp.cid = ''
+                        this.resetTemp()
                         this.$notify({
                             title: '失败',
                             message: '取消关联',
@@ -450,7 +475,10 @@ export default {
                     delete temp.createdAt
                     delete temp.updatedAt
                     updateCard(temp).then(() => {
+                        this.resetTemp()
+                        this.$refs['dataForm'].clearValidate()
                         this.dialogFormVisible = false
+                        this.getList()
                         this.$notify({
                             title: 'Success',
                             message: '更新成功',

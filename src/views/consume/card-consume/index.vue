@@ -4,7 +4,6 @@
       <el-autocomplete
         v-model="phone"
         :fetch-suggestions="querySearchAsync"
-        clearable
         placeholder="请输入客户手机号，搜索会员卡"
         style="width: 100%;"
         @select="handleSelect"
@@ -15,8 +14,8 @@
           @click="handleIconClick"
         />
         <template slot-scope="{ item }">
-          <span class="name">{{ item.value }}</span>
-          <span class="phone">{{ item.phone }}</span>
+          <span class="name">姓名：{{ item.value }}</span>
+          <span class="phone">手机号码：{{ item.phone }}</span>
         </template>
       </el-autocomplete>
     </aside>
@@ -29,33 +28,44 @@
             </div>
             <el-form ref="form" :model="form" label-width="140px">
               <el-form-item label="消费金额：">
-                <el-input
-                  v-model="form.monetary"
-                  placeholder="请输入消费金额"
-                >
-                  <template slot="append">元</template>
-                </el-input>
+                <div class="number-wrap">
+                  <el-input-number
+                    v-model="form.monetary"
+                    controls-position="right"
+                    placeholder="请输入消费金额"
+                    :controls="false"
+                    size="medium"
+                    :min="0"
+                    :max="restMoney"
+                  />
+                  <span>元</span>
+                </div>
               </el-form-item>
               <el-form-item label="是否使用优惠券：">
                 <el-switch v-model="form.couponUse" />
               </el-form-item>
-              <el-form-item label="选择优惠券：">
+              <el-form-item
+                v-if="form.couponUse"
+                label="选择优惠券："
+              >
                 <el-select
                   v-model="form.couponSelect"
                   placeholder="请选择"
+                  @change="handleCouponChange"
                 >
                   <el-option
-                    v-for="item in cities"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in couponList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
                   >
-                    <span style="float: left">{{
-                      item.label
-                    }}</span>
-                    <span
-                      style="float: right; color: #8492a6; font-size: 13px"
-                    >{{ item.value }}</span>
+                    <!-- <span style="float: left">{{
+                                            item.label
+                                        }}</span>
+                                        <span
+                                            style="float: right; color: #8492a6; font-size: 13px"
+                                            >{{ item.value }}</span
+                                        > -->
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -64,11 +74,13 @@
             <h4>结算</h4>
             <ul class="info">
               <li>
-                <label>消费金额:</label><span>{{ form.monetary }}</span>
+                <label>消费金额:</label><span>{{ form.monetary }}元</span>
               </li>
-              <li><label>会员卡:</label><span>-200</span></li>
-              <li><label>优惠券:</label><span>+20</span></li>
-              <li><label>实际消费:</label><span>-180</span></li>
+              <li>
+                <label>会员卡:</label><span>-{{ form.monetary }}元</span>
+              </li>
+              <li><label>优惠券:</label><span>+20元</span></li>
+              <li><label>实际消费:</label><span>-180元</span></li>
             </ul>
           </el-card>
         </div>
@@ -81,8 +93,8 @@
                 <div slot="header" class="clearfix">
                   <span>会员卡信息</span>
                 </div>
-                <ul class="info">
-                  <li v-for="o in memberData" :key="o.value">
+                <ul v-if="phone" class="info">
+                  <li v-for="o in cardInfo" :key="o.key">
                     <label>{{ o.label }}:</label><span>{{ o.value }}</span>
                   </li>
                 </ul>
@@ -95,7 +107,10 @@
                 <div slot="header" class="clearfix">
                   <span>优惠券信息</span>
                 </div>
-                <ul class="info">
+                <ul
+                  v-if="form.couponSelect && form.couponUse"
+                  class="info"
+                >
                   <li v-for="o in couponData" :key="o.value">
                     <label>{{ o.label }}:</label><span>{{ o.value }}</span>
                   </li>
@@ -112,7 +127,8 @@
 <script>
 import splitPane from 'vue-splitpane'
 import { fetchCardList } from '@/api/consume'
-import { fetchConfigType, fetchCardInfoById } from '@/api/card'
+import { fetchConfigTypeById } from '@/api/card'
+import { getCoupon } from '@/api/coupon'
 
 export default {
     name: 'CardConsume',
@@ -124,86 +140,65 @@ export default {
             timeout: null,
             form: {
                 monetary: '',
-                couponUse: true,
+                couponUse: false,
                 couponSelect: ''
             },
-            cities: [
-                {
-                    value: 'Beijing',
-                    label: '北京'
-                },
-                {
-                    value: 'Shanghai',
-                    label: '上海'
-                },
-                {
-                    value: 'Nanjing',
-                    label: '南京'
-                },
-                {
-                    value: 'Chengdu',
-                    label: '成都'
-                },
-                {
-                    value: 'Shenzhen',
-                    label: '深圳'
-                },
-                {
-                    value: 'Guangzhou',
-                    label: '广州'
-                }
-            ],
-            memberData: [
+            cardInfo: [
                 {
                     label: '客户称呼',
-                    value: '张先生',
+                    value: '',
                     key: 'customerName'
                 },
                 {
                     label: '客户手机号',
-                    value: '18020191235',
+                    value: '',
                     key: 'customerPhone'
                 },
                 {
                     label: '会员卡名称',
-                    value: '充200减20'
+                    value: '',
+                    key: 'name'
                 },
                 {
                     label: '会员卡类型',
-                    value: '充值会员卡'
+                    value: '',
+                    key: 'stype'
                 },
                 {
                     label: '优惠类型',
-                    value: '打折会员卡'
+                    value: '',
+                    key: 'config.type'
                 },
                 {
                     label: '剩余金额',
-                    value: '180元'
+                    value: '',
+                    key: 'money'
                 },
                 {
                     label: '折扣力度',
-                    value: '80%'
+                    value: '',
+                    key: 'discount'
                 }
             ],
             couponData: [
                 {
                     label: '优惠券名称',
-                    value: '充200减20'
+                    value: '',
+                    key: 'name'
                 },
                 {
                     label: '优惠券类型',
-                    value: '充值会员卡'
-                },
-                {
-                    label: '优惠类型',
-                    value: '打折会员卡'
+                    value: '',
+                    key: 'type'
                 },
                 {
                     label: '优惠方式',
-                    value: '180元'
+                    value: '',
+                    key: 'way'
                 }
             ],
-            configTypeList: []
+            couponList: [],
+            restMoney: 0
         }
     },
     computed: {
@@ -212,7 +207,7 @@ export default {
         }
     },
     created() {
-        this.getConfigType()
+        this.getCouponList()
     },
     methods: {
         resize() {},
@@ -221,41 +216,80 @@ export default {
             const eid = ep[0].eid
             const phone = this.phone
             fetchCardList({ eid, phone }).then(response => {
-                this.cards = response.records.map(_ => {
-                    return Object.assign({}, _, {
-                        value: _.customerName,
-                        phone: _.customerPhone
+                this.cards = response.records
+                    .map(_ => {
+                        if (_.status === 'CLOSED') return false
+                        return Object.assign({}, _, {
+                            value: _.customerName,
+                            phone: _.customerPhone
+                        })
                     })
-                })
+                    .filter(_ => !!_)
                 cb(this.cards)
             })
         },
-        getConfigType() {
-            const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
-            const eid = ep[0].eid
-            fetchConfigType(eid).then(response => {
-                console.log(response, 'response')
-                if (Array.isArray(response)) {
-                    this.configTypeList = response
-                    console.log(this.configTypeList, 'hh')
-                }
-            })
-        },
-        getCardInfoById(id) {
+        getConfigTypeById(id) {
             return new Promise((resolve, reject) => {
-                fetchCardInfoById(id).then(response => {
-                    console.log(response, 'fetchCardInfoById')
+                fetchConfigTypeById(id).then(response => {
                     resolve(response)
                 })
             })
         },
-        handleSelect(item) {
-            const { cid } = item
-            this.getCardInfoById(cid)
-            console.log(item, this.configTypeList, 'item')
+        async handleSelect(item) {
+            console.log(item, 'item')
+            const typeObj = {
+                CREDITED: '充值会员卡',
+                TIMED: '时间会员卡'
+            }
+            const { cid, money } = item
+            this.restMoney = money
+            const configTypeInfo = await this.getConfigTypeById(cid)
+            configTypeInfo.type &&
+                (configTypeInfo.stype = typeObj[configTypeInfo.type])
+            this.cardInfo.forEach(_ => {
+                _.value = item[_.key]
+                if (_.value == null) {
+                    _.value = configTypeInfo[_.key] || '无'
+                }
+            })
         },
         handleIconClick(ev) {
             console.log(ev)
+        },
+        getCouponList() {
+            const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
+            getCoupon(ep[0].eid).then(response => {
+                if (Array.isArray(response)) {
+                    this.couponList = response
+                }
+            })
+        },
+        handleCouponChange(val) {
+            const cl = this.couponList.filter(_ => _.id === val)
+            cl.length && (this.couponInfo = cl[0])
+            const couponType = {
+                REBATE: '抵价优惠券',
+                DISCOUNT: '折扣优惠券',
+                GIFT: '赠送优惠券'
+            }
+            this.couponData.forEach(_ => {
+                if (_.key === 'type') {
+                    _.value = couponType[this.couponInfo[_.key]]
+                    return
+                }
+                if (_.key === 'way') {
+                    if (this.couponInfo['type'] === 'DISCOUNT') {
+                        _.value = `满${this.couponInfo.amount}打${this
+                            .couponInfo.parsedBenefit / 10}折`
+                    } else if (this.couponInfo['type'] === 'REBATE') {
+                        _.value = `满${this.couponInfo.amount}抵${this.couponInfo.parsedBenefit}元`
+                    } else {
+                        _.value = `满${this.couponInfo.amount}送${this.couponInfo.parsedBenefit}`
+                    }
+                    return
+                }
+                _.value = this.couponInfo[_.key]
+            })
         }
     }
 }
@@ -265,7 +299,14 @@ export default {
 @import "~@/styles/variables.scss";
 .components-container {
     position: relative;
-    height: 100vh;
+    height: calc(100vh - 144px);
+    & > .vue-splitter-container {
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+        top: 78px;
+        height: auto;
+    }
 }
 
 aside {
@@ -336,5 +377,36 @@ ul.info {
         text-align: right;
         margin-right: 20px;
     }
+}
+.number-wrap {
+    width: 100%;
+    position: relative;
+    >>> .el-input__inner {
+        border-radius: 4px 0 0 4px;
+    }
+    span {
+        position: absolute;
+        left: 200px;
+        top: 2px;
+        bottom: 2px;
+        width: 38px;
+        background-color: #f5f7fa;
+        color: #909399;
+        border: 1px solid #dcdfe6;
+        text-align: center;
+        border-radius: 0 4px 4px 0;
+        line-height: 36px;
+        border-left: 0;
+    }
+}
+.name {
+    width: 20%;
+    float: left;
+    min-width: 100px;
+}
+.phone {
+    font-weight: bold;
+    color: grey;
+    margin-left: 14px;
 }
 </style>

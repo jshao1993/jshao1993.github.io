@@ -14,10 +14,29 @@ export function fetchList({
     })
 }
 
+// 根据商家ID，客户手机号查询会员卡，查询具体会员卡
+export function fetchCard({
+    eid,
+    phone
+}) {
+    return request({
+        url: `/v1/ms/${eid}/phone/${phone}`,
+        method: 'get'
+    })
+}
+
 // 根据商家查询会员卡类型
 export function fetchConfigType(eid) {
     return request({
         url: `/v1/ms/config/enterprise/${eid}`,
+        method: 'get'
+    })
+}
+
+// 根据会员卡配置id，查询会员卡配置
+export function fetchConfigTypeById(id) {
+    return request({
+        url: `/v1/ms/config/${id}`,
         method: 'get'
     })
 }

@@ -30,7 +30,7 @@
     <el-row :gutter="12">
       <el-col v-for="card in list" :key="card.id" :span="6">
         <el-card shadow="hover">
-          <el-divider>{{ card.name }}</el-divider>
+          <el-divider class="card-tip">{{ card.name }}</el-divider>
           <div class="card-wrap">
             <div class="card-circle">
               <h5>
@@ -42,7 +42,13 @@
               </div>
             </div>
             <div class="card-detail">
-              <h4>消费{{ card.amount }}{{ card.parsedBenefit | benefitFilter(card.type) }}</h4>
+              <h4>
+                消费{{ card.amount
+                }}{{
+                  card.parsedBenefit
+                    | benefitFilter(card.type)
+                }}
+              </h4>
               <p>
                 发券数
                 <i class="el-icon-bank-card" />
@@ -62,7 +68,10 @@
                 v-if="cardTypeObj[card.type]"
                 class="el-icon-caret-bottom"
               />
-              {{ card.parsedBenefit | benefitDetailFilter(card.type) }}
+              {{
+                card.parsedBenefit
+                  | benefitDetailFilter(card.type)
+              }}
             </p>
           </div>
           <div class="card-handle">
@@ -113,40 +122,78 @@
           </el-select>
         </el-form-item>
         <el-form-item label="优惠券名称:" prop="name">
-          <el-input v-model="temp.name" clearable placeholder="请输入优惠券名称" />
+          <el-input
+            v-model="temp.name"
+            clearable
+            placeholder="请输入优惠券名称"
+          />
         </el-form-item>
         <el-form-item label="消费金额:" prop="amount">
-          <el-input v-model="temp.amount" clearable placeholder="请输入消费金额">
+          <el-input
+            v-model="temp.amount"
+            clearable
+            placeholder="请输入消费金额"
+          >
             <el-button slot="append">元</el-button>
           </el-input>
         </el-form-item>
         <el-form-item
           v-if="typeMapOptionsObj[temp.type].label === 'DISCOUNT'"
-          :rules="[{ required: true, message: '打折力度为必填', trigger: 'blur' }]"
+          :rules="[
+            {
+              required: true,
+              message: '打折力度为必填',
+              trigger: 'blur'
+            }
+          ]"
           label="打折力度:"
           prop="benefit"
         >
-          <el-input v-model="temp.benefit" clearable placeholder="请输入打折力度">
+          <el-input
+            v-model="temp.benefit"
+            clearable
+            placeholder="请输入打折力度"
+          >
             <el-button slot="append">%</el-button>
           </el-input>
         </el-form-item>
         <el-form-item
           v-if="typeMapOptionsObj[temp.type].label === 'REBATE'"
-          :rules="[{ required: true, message: '抵价额为必填', trigger: 'blur' }]"
+          :rules="[
+            {
+              required: true,
+              message: '抵价额为必填',
+              trigger: 'blur'
+            }
+          ]"
           label="抵价额:"
           prop="benefit"
         >
-          <el-input v-model="temp.benefit" clearable placeholder="请输入抵价额">
+          <el-input
+            v-model="temp.benefit"
+            clearable
+            placeholder="请输入抵价额"
+          >
             <el-button slot="append">元</el-button>
           </el-input>
         </el-form-item>
         <el-form-item
           v-if="typeMapOptionsObj[temp.type].label === 'GIFT'"
-          :rules="[{ required: true, message: '赠送内容为必填', trigger: 'blur' }]"
+          :rules="[
+            {
+              required: true,
+              message: '赠送内容为必填',
+              trigger: 'blur'
+            }
+          ]"
           label="赠送内容:"
           prop="benefit"
         >
-          <el-input v-model="temp.benefit" clearable placeholder="请输入赠送内容" />
+          <el-input
+            v-model="temp.benefit"
+            clearable
+            placeholder="请输入赠送内容"
+          />
         </el-form-item>
         <el-form-item label="使用说明:" prop="intro">
           <el-input
@@ -160,7 +207,12 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeDialog">关闭</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确定</el-button>
+        <el-button
+          type="primary"
+          @click="
+            dialogStatus === 'create' ? createData() : updateData()
+          "
+        >确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -203,7 +255,7 @@ const cardTypeObj = {
 }
 
 export default {
-    name: 'ComplexTable',
+    name: 'CouponList',
     directives: { waves },
     components: {
         noData
@@ -213,7 +265,7 @@ export default {
             if (type === 'REBATE') {
                 return `抵${benefit}`
             } else if (type === 'DISCOUNT') {
-                return `打${benefit}折`
+                return `打${benefit / 10}折`
             } else {
                 return `送${benefit}`
             }
@@ -262,20 +314,38 @@ export default {
         rules() {
             return {
                 type: [
-                    { required: true, message: '优惠券类型为必选', trigger: 'change' }
+                    {
+                        required: true,
+                        message: '优惠券类型为必选',
+                        trigger: 'change'
+                    }
                 ],
                 name: [
-                    { required: true, message: '优惠券名称为必填', trigger: 'blur' }
+                    {
+                        required: true,
+                        message: '优惠券名称为必填',
+                        trigger: 'blur'
+                    }
                 ],
                 amount: [
-                    { required: true, message: '消费金额为必填', trigger: 'blur' },
+                    {
+                        required: true,
+                        message: '消费金额为必填',
+                        trigger: 'blur'
+                    },
                     {
                         pattern: patterns.positiveNumber,
                         message: '请输入正确的消费金额',
                         trigger: 'blur'
                     }
                 ],
-                intro: [{ required: true, message: '使用说明为必填', trigger: 'blur' }]
+                intro: [
+                    {
+                        required: true,
+                        message: '使用说明为必填',
+                        trigger: 'blur'
+                    }
+                ]
             }
         }
     },
@@ -288,7 +358,6 @@ export default {
             getCoupon(ep[0].eid).then(response => {
                 if (Array.isArray(response)) {
                     this.listQuery.name == null && (this.listQuery.name = '') // null or undefined
-                    console.log(this.listQuery.name, 'this.listQuery.name')
                     this.list = response.filter(
                         _ => !!_.type && !!~_.name.indexOf(this.listQuery.name)
                     )
@@ -314,7 +383,9 @@ export default {
         createData() {
             this.$refs['dataForm'].validate(valid => {
                 if (valid) {
-                    const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
+                    const ep = this.enterprise.filter(
+                        _ => _.name === '李宝的店铺'
+                    )
                     this.temp.eid = ep[0].eid
                     addCoupon(this.temp).then(() => {
                         this.$refs['dataForm'].resetFields()
@@ -340,7 +411,9 @@ export default {
         },
         handleUpdate(card) {
             this.temp = Object.assign({}, card) // copy obj
-            const type = this.typeMapOptions.filter(_ => _.desc === this.temp.type)
+            const type = this.typeMapOptions.filter(
+                _ => _.desc === this.temp.type
+            )
             this.temp.type = type.length ? type[0].value : ''
             this.dialogStatus = 'update'
             this.dialogFormVisible = true
@@ -400,118 +473,137 @@ export default {
 
 <style scoped lang="scss">
 .el-switch {
-  /deep/ .el-switch__label {
-    color: #606266;
-    &.is-active {
-      color: #1890ff;
+    /deep/ .el-switch__label {
+        color: #606266;
+        &.is-active {
+            color: #1890ff;
+        }
     }
-  }
 }
 .table-expand {
-  font-size: 0;
+    font-size: 0;
 }
 .table-expand label {
-  width: 90px;
-  color: #99a9bf;
+    width: 90px;
+    color: #99a9bf;
 }
 .table-expand .el-form-item {
-  margin-right: 0;
-  margin-bottom: 0;
-  width: 50%;
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 50%;
 }
 
 .el-divider--horizontal {
-  margin: 12px 0;
+    margin: 12px 0;
 }
 
 .card-wrap {
-  .card-circle {
-    width: 100px;
-    float: left;
-    text-align: center;
-    h5 {
-      margin: 10px 0;
-      color: red;
+    .card-circle {
+        width: 100px;
+        float: left;
+        text-align: center;
+        h5 {
+            margin: 10px 0;
+            color: red;
+        }
+        div {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #108eff;
+            text-align: center;
+            /* vertical-align: middle; */
+            line-height: 60px;
+            color: #fff;
+            margin: 0 auto;
+        }
     }
-    div {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #108eff;
-      text-align: center;
-      /* vertical-align: middle; */
-      line-height: 60px;
-      color: #fff;
-      margin: 0 auto;
+    .card-detail {
+        margin-left: 100px;
+        height: 95px;
+        text-align: center;
+        h4 {
+            line-height: 2.3;
+            margin: 0;
+            font-size: 22px;
+            color: #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        p {
+            margin: 0;
+            line-height: 2.8;
+            font-size: 14px;
+        }
     }
-  }
-  .card-detail {
-    margin-left: 100px;
-    height: 95px;
-    text-align: center;
-    h4 {
-      line-height: 2.3;
-      margin: 0;
-      font-size: 22px;
-      color: #ddd;
-    }
-    p {
-      margin: 0;
-      line-height: 2.8;
-      font-size: 14px;
-    }
-  }
 }
 .card-amount {
-  font-size: 14px;
-  text-align: center;
-  line-height: 16px;
-  height: 16px;
-  & > p:first-child {
-    width: 110px;
-    margin: 0;
-    float: left;
-  }
-  & > p:last-child {
-    margin-left: 120px;
-    margin-top: 10px;
-    margin-bottom: 5px;
-  }
+    font-size: 14px;
+    text-align: center;
+    line-height: 16px;
+    height: 16px;
+    & > p:first-child {
+        width: 110px;
+        margin: 0;
+        float: left;
+    }
+    & > p:last-child {
+        margin-left: 120px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
 }
 .card-handle {
-  overflow: hidden;
-  background: #f8f9fa;
-  margin: 0 -20px;
-  text-align: center;
-  margin-bottom: -20px;
-  margin-top: 10px;
-  font-size: 14px;
-  color: grey;
-  p {
-    width: 50%;
-    float: left;
-    &:hover {
-      color: #e6a23c;
+    overflow: hidden;
+    background: #f8f9fa;
+    margin: 0 -20px;
+    text-align: center;
+    margin-bottom: -20px;
+    margin-top: 10px;
+    font-size: 14px;
+    color: grey;
+    p {
+        width: 50%;
+        float: left;
+        &:hover {
+            color: #e6a23c;
+        }
     }
-  }
 }
 
 .el-icon-caret-top {
-  color: #67c23a;
+    color: #67c23a;
 }
 
 .el-icon-caret-bottom {
-  color: #f56c6c;
+    color: #f56c6c;
 }
 
 .el-icon-bank-card {
-  color: #7f91ff;
-  margin: 0 6px;
-  font-size: 16px;
+    color: #7f91ff;
+    margin: 0 6px;
+    font-size: 16px;
 }
 
 .el-icon-postcard {
-  font-size: 28px;
-  line-height: 60px;
+    font-size: 28px;
+    line-height: 60px;
+}
+.el-card {
+    min-width: 260px;
+}
+.card-tip {
+    >>> .el-divider__text {
+        color: red;
+        white-space: nowrap;
+        max-width: 80%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+.el-col-6 {
+    min-width: 266px;
+    margin-bottom: 12px;
 }
 </style>

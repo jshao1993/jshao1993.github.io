@@ -42,7 +42,9 @@
               </div>
             </div>
             <div class="card-detail">
-              <h4>{{ card.name }}</h4>
+              <h4>
+                {{ card.name }}
+              </h4>
               <p>
                 发卡数
                 <i class="el-icon-bank-card" />
@@ -201,15 +203,6 @@
           </template>
           <!-- 优惠类型：充值返券 -->
           <template v-else>
-            <el-form-item prop="config.cashBack" label="返现金额:">
-              <el-input
-                v-model="temp.config.cashBack"
-                clearable
-                placeholder="请输入返现金额"
-              >
-                <el-button slot="append">元</el-button>
-              </el-input>
-            </el-form-item>
             <el-form-item
               label="是否使用优惠券:"
               prop="config.useCoupon"
@@ -239,6 +232,19 @@
                   :value="item.id"
                 />
               </el-select>
+            </el-form-item>
+            <el-form-item
+              v-else
+              prop="config.cashBack"
+              label="返现金额:"
+            >
+              <el-input
+                v-model="temp.config.cashBack"
+                clearable
+                placeholder="请输入返现金额"
+              >
+                <el-button slot="append">元</el-button>
+              </el-input>
             </el-form-item>
           </template>
         </template>
@@ -276,7 +282,7 @@ const membercardsTypeOptions = [
 ]
 
 const preferentialTypeOptions = [
-    { label: '充值返券', value: 'COUPON' },
+    { label: '充值返现（券）', value: 'COUPON' },
     { label: '打折卡', value: 'DISCOUNT' }
 ]
 
@@ -290,6 +296,8 @@ const timeTypeOptions = [
     { label: '自定义', value: 'CUSTOMIZE' }
 ]
 
+let currentThis
+
 export default {
     name: 'CardConfig',
     directives: { waves },
@@ -301,7 +309,7 @@ export default {
             const typeObj = {
                 TIMED: '时间卡',
                 DISCOUNT: '打折卡',
-                COUPON: '返劵卡'
+                COUPON: '返现(劵)卡'
             }
             let desc = typeObj[configType]
             if (typeof config.useCoupon !== 'boolean') return desc
@@ -333,9 +341,18 @@ export default {
             } else {
                 if (typeof config.useCoupon === 'boolean') {
                     const couponIdExsist = typeof config.couponId === 'number'
-                    return config.useCoupon && couponIdExsist
-                        ? `${config.cashBack}元劵`
-                        : `${config.cashBack}`
+                    if (config.useCoupon && couponIdExsist) {
+                        const currentCoupon = currentThis.couponList.filter(
+                            _ => _.id === config.couponId
+                        )
+                        if (currentCoupon.length) {
+                            return currentCoupon[0].name
+                        } else {
+                            return '--'
+                        }
+                    } else {
+                        return `${config.cashBack}元`
+                    }
                 }
                 return ''
             }
@@ -346,7 +363,7 @@ export default {
             const result = await this.getConfigType()
             const idExsist =
                 this.cardObj !== null &&
-                this.cardObj.id !== null && // null or undefined
+                this.cardObj.id != null && // null or undefined
                 this.cardObj.id !== ''
             const len = result.filter(_ => {
                 if (idExsist && this.cardObj.id === _.id) {
@@ -471,17 +488,23 @@ export default {
             return this.$store.getters.enterprise
         }
     },
-    created() {
+    beforeCreate: function() {
+        currentThis = this
+    },
+    async created() {
+        await this.getCouponList()
         this.getConfigType()
-        this.getCouponList()
     },
     methods: {
         getCouponList() {
             const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
-            getCoupon(ep[0].eid).then(response => {
-                if (Array.isArray(response)) {
-                    this.couponList = response
-                }
+            return new Promise((resolve, reject) => {
+                getCoupon(ep[0].eid).then(response => {
+                    if (Array.isArray(response)) {
+                        this.couponList = response
+                        resolve(this.couponList)
+                    }
+                })
             })
         },
         getConfigType() {
@@ -558,9 +581,13 @@ export default {
                     } = config
                     paramsObj.config.type = type
                     paramsObj.config.amount = amount
-                    paramsObj.config.cashBack = cashBack
                     paramsObj.config.useCoupon = useCoupon
-                    useCoupon && (paramsObj.config.couponId = couponId)
+                    if (useCoupon) {
+                        paramsObj.config.couponId = couponId
+                        paramsObj.config.cashBack = 0
+                    } else {
+                        paramsObj.config.cashBack = cashBack
+                    }
                 }
             }
             return paramsObj
@@ -739,6 +766,9 @@ export default {
             margin: 0;
             font-size: 22px;
             color: #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         p {
             margin: 0;
@@ -761,6 +791,9 @@ export default {
         margin-left: 120px;
         margin-top: 10px;
         margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 .card-handle {
@@ -807,5 +840,11 @@ export default {
 }
 .el-col-6 {
     padding: 5px 6px;
+    min-width: 266px;
+    margin-bottom: 12px;
+}
+
+.el-card {
+    min-width: 260px;
 }
 </style>

@@ -85,7 +85,7 @@
               </li>
             </ul>
             <el-row>
-              <el-button type="primary" :disabled="!cardId" @click="handleSure">核销</el-button>
+              <el-button type="primary" :disabled="!cardId || !phone" @click="handleSure">核销</el-button>
               <el-button @click="handleCancel">取消</el-button>
             </el-row>
           </el-card>

@@ -40,221 +40,233 @@ import cardRouter from './modules/card'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-export const constantRoutes = [{
+export const constantRoutes = [
+  {
     path: '/redirect',
     component: Layout,
     hidden: true,
-    children: [{
+    children: [
+      {
         path: '/redirect/:path*',
         component: () => import('@/views/redirect/index')
-    }]
-},
-{
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
-},
-{
+  },
+  {
     path: '/auth-redirect',
     component: () => import('@/views/login/auth-redirect'),
     hidden: true
-},
-{
+  },
+  {
     path: '/404',
     component: () => import('@/views/error-page/404'),
     hidden: true
-},
-{
+  },
+  {
     path: '/401',
     component: () => import('@/views/error-page/401'),
     hidden: true
-},
-{
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
     hidden: false,
-    children: [{
+    children: [
+      {
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
         meta: {
-            title: '主页',
-            icon: 'dashboard',
-            affix: true
+          title: '主页',
+          icon: 'dashboard',
+          affix: true
         }
-    }]
-},
-{
+      }
+    ]
+  },
+  {
     path: '/consume',
     component: Layout,
     name: 'Consume',
     meta: {
-        title: '消费',
-        icon: 'list'
+      title: '消费',
+      icon: 'list'
     },
     redirect: '/consume/page',
-    children: [{
+    children: [
+      {
         path: 'page',
         component: () => import('@/views/consume/card-consume/index'),
         name: 'PageConsume',
         meta: {
-            title: '会员卡消费',
-            icon: 'lock',
-            affix: true
+          title: '会员卡消费',
+          icon: 'lock',
+          affix: true
         }
-    },
-    {
+      },
+      {
         path: 'records',
-        component: () => import('@/views/consume/consume-records/index'),
+        component: () =>
+                    import('@/views/consume/consume-records/index'),
         name: 'RecordsConsume',
         meta: {
-            title: '消费记录',
-            icon: 'money',
-            affix: true
+          title: '消费记录',
+          icon: 'money',
+          affix: true
         }
-    }
+      }
     ]
-},
-cardRouter,
-{
+  },
+  cardRouter,
+  {
     path: '/coupon',
     component: Layout,
     name: 'Coupon',
     meta: {
-        title: '优惠券',
-        icon: 'clipboard'
+      title: '优惠券',
+      icon: 'clipboard'
     },
     redirect: '/coupon/list',
-    children: [{
+    children: [
+      {
         path: 'list',
         component: () => import('@/views/coupon/index'),
         name: 'ListCoupon',
         meta: {
-            title: '优惠券配置',
-            icon: 'guide',
-            affix: true
+          title: '优惠券配置',
+          icon: 'guide',
+          affix: true
         }
-    }]
-},
-// {
-//     path: '/user',
-//     component: Layout,
-//     name: 'User',
-//     meta: {
-//         title: '会员管理',
-//         icon: 'dashboard'
-//     },
-//     redirect: '/user/list',
-//     children: [{
-//         path: 'list',
-//         component: () => import('@/views/user/index'),
-//         name: 'ListUser',
-//         meta: {
-//             title: '会员管理',
-//             icon: 'documentation',
-//             affix: true
-//         }
-//     }]
-// },
-{
+      }
+    ]
+  },
+  // {
+  //     path: '/user',
+  //     component: Layout,
+  //     name: 'User',
+  //     meta: {
+  //         title: '会员管理',
+  //         icon: 'dashboard'
+  //     },
+  //     redirect: '/user/list',
+  //     children: [{
+  //         path: 'list',
+  //         component: () => import('@/views/user/index'),
+  //         name: 'ListUser',
+  //         meta: {
+  //             title: '会员管理',
+  //             icon: 'documentation',
+  //             affix: true
+  //         }
+  //     }]
+  // },
+  {
     path: '/enterprise',
     component: Layout,
     name: 'Enterprise',
     meta: {
-        title: '商家管理',
-        icon: 'qq'
+      title: '商家管理',
+      icon: 'qq'
     },
     redirect: '/enterprise/list',
-    children: [{
+    children: [
+      {
         path: 'list',
         component: () => import('@/views/enterprise/index'),
         name: 'ListEnterprise',
         meta: {
-            title: '商家管理',
-            icon: 'qq',
-            affix: true
+          title: '商家管理',
+          icon: 'qq',
+          affix: true
         }
-    }]
-},
-{
+      }
+    ]
+  },
+  {
     path: '/system',
     component: Layout,
     meta: {
-        title: '系统设置',
-        icon: 'size'
+      title: '系统设置',
+      icon: 'size'
     },
     redirect: '/system/store',
-    children: [{
-        path: 'store',
-        component: () => import('@/views/system/store'),
-        name: 'Documentation',
-        meta: {
-            title: '店面设置',
-            icon: 'star',
-            affix: true
-        }
-    },
-    {
+    children: [
+      //     {
+      //     path: 'store',
+      //     component: () => import('@/views/system/store'),
+      //     name: 'Documentation',
+      //     meta: {
+      //         title: '店面设置',
+      //         icon: 'star',
+      //         affix: true
+      //     }
+      // },
+      {
         path: 'assistant',
         component: () => import('@/views/system/assistant'),
-        name: 'Documentation',
+        name: 'User',
         meta: {
-            title: '用户管理',
-            icon: 'user',
-            affix: true
+          title: '用户管理',
+          icon: 'user',
+          affix: true
         }
-    },
-    {
+      },
+      {
         path: 'role',
         component: () => import('@/views/system/role'),
-        name: 'Documentation',
+        name: 'Role',
         meta: {
-            title: '角色管理',
-            icon: 'people',
-            affix: true
+          title: '角色管理',
+          icon: 'people',
+          affix: true
         }
-    },
-    {
-        path: 'authority',
-        component: () => import('@/views/system/authority'),
-        name: 'Documentation',
-        meta: {
-            title: '权限管理',
-            icon: 'education',
-            affix: true
-        }
-    }
+      }
+      // {
+      //     path: 'authority',
+      //     component: () => import('@/views/system/authority'),
+      //     name: 'Documentation',
+      //     meta: {
+      //         title: '权限管理',
+      //         icon: 'education',
+      //         affix: true
+      //     }
+      // }
     ]
-}
-    // couponRouter
-    // {
-    //   path: '/guide',
-    //   component: Layout,
-    //   redirect: '/guide/index',
-    //   children: [
-    //     {
-    //       path: 'index',
-    //       component: () => import('@/views/guide/index'),
-    //       name: 'Guide',
-    //       meta: { title: 'Guide', icon: 'guide', noCache: true }
-    //     }
-    //   ]
-    // },
-    // {
-    //   path: '/profile',
-    //   component: Layout,
-    //   redirect: '/profile/index',
-    //   hidden: true,
-    //   children: [
-    //     {
-    //       path: 'index',
-    //       component: () => import('@/views/profile/index'),
-    //       name: 'Profile',
-    //       meta: { title: 'Profile', icon: 'user', noCache: true }
-    //     }
-    //   ]
-    // }
+  }
+  // couponRouter
+  // {
+  //   path: '/guide',
+  //   component: Layout,
+  //   redirect: '/guide/index',
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/guide/index'),
+  //       name: 'Guide',
+  //       meta: { title: 'Guide', icon: 'guide', noCache: true }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/profile',
+  //   component: Layout,
+  //   redirect: '/profile/index',
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/profile/index'),
+  //       name: 'Profile',
+  //       meta: { title: 'Profile', icon: 'user', noCache: true }
+  //     }
+  //   ]
+  // }
 ]
 
 /**
@@ -262,283 +274,284 @@ cardRouter,
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-    // {
-    //   path: '/permission',
-    //   component: Layout,
-    //   redirect: '/permission/page',
-    //   alwaysShow: true, // will always show the root menu
-    //   name: 'Permission',
-    //   meta: {
-    //     title: 'Permission',
-    //     icon: 'lock',
-    //     roles: ['admin', 'editor'] // you can set roles in root nav
-    //   },
-    //   children: [
-    //     {
-    //       path: 'page',
-    //       component: () => import('@/views/permission/page'),
-    //       name: 'PagePermission',
-    //       meta: {
-    //         title: 'Page Permission',
-    //         roles: ['admin'] // or you can only set roles in sub nav
-    //       }
-    //     },
-    //     {
-    //       path: 'directive',
-    //       component: () => import('@/views/permission/directive'),
-    //       name: 'DirectivePermission',
-    //       meta: {
-    //         title: 'Directive Permission'
-    //         // if do not set roles, means: this page does not require permission
-    //       }
-    //     },
-    //     {
-    //       path: 'role',
-    //       component: () => import('@/views/permission/role'),
-    //       name: 'RolePermission',
-    //       meta: {
-    //         title: 'Role Permission',
-    //         roles: ['admin']
-    //       }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/permission',
+  //   component: Layout,
+  //   redirect: '/permission/page',
+  //   alwaysShow: true, // will always show the root menu
+  //   name: 'Permission',
+  //   meta: {
+  //     title: 'Permission',
+  //     icon: 'lock',
+  //     roles: ['admin', 'editor'] // you can set roles in root nav
+  //   },
+  //   children: [
+  //     {
+  //       path: 'page',
+  //       component: () => import('@/views/permission/page'),
+  //       name: 'PagePermission',
+  //       meta: {
+  //         title: 'Page Permission',
+  //         roles: ['admin'] // or you can only set roles in sub nav
+  //       }
+  //     },
+  //     {
+  //       path: 'directive',
+  //       component: () => import('@/views/permission/directive'),
+  //       name: 'DirectivePermission',
+  //       meta: {
+  //         title: 'Directive Permission'
+  //         // if do not set roles, means: this page does not require permission
+  //       }
+  //     },
+  //     {
+  //       path: 'role',
+  //       component: () => import('@/views/permission/role'),
+  //       name: 'RolePermission',
+  //       meta: {
+  //         title: 'Role Permission',
+  //         roles: ['admin']
+  //       }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: '/icon',
-    //   component: Layout,
-    //   children: [
-    //     {
-    //       path: 'index',
-    //       component: () => import('@/views/icons/index'),
-    //       name: 'Icons',
-    //       meta: { title: 'Icons', icon: 'icon', noCache: true }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/icon',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/icons/index'),
+  //       name: 'Icons',
+  //       meta: { title: 'Icons', icon: 'icon', noCache: true }
+  //     }
+  //   ]
+  // },
 
-    /** when your routing map is too long, you can split it into small modules **/
-    // componentsRouter,
-    // chartsRouter,
-    // nestedRouter,
-    // tableRouter,
-    // cardRouter,
-    // couponRouter,
-    // {
-    //   path: '/example',
-    //   component: Layout,
-    //   redirect: '/example/list',
-    //   name: 'Example',
-    //   meta: {
-    //     title: 'Example',
-    //     icon: 'example'
-    //   },
-    //   children: [
-    //     {
-    //       path: 'create',
-    //       component: () => import('@/views/example/create'),
-    //       name: 'CreateArticle',
-    //       meta: { title: 'Create Article', icon: 'edit' }
-    //     },
-    //     {
-    //       path: 'edit/:id(\\d+)',
-    //       component: () => import('@/views/example/edit'),
-    //       name: 'EditArticle',
-    //       meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
-    //       hidden: true
-    //     },
-    //     {
-    //       path: 'list',
-    //       component: () => import('@/views/example/list'),
-    //       name: 'ArticleList',
-    //       meta: { title: 'Article List', icon: 'list' }
-    //     }
-    //   ]
-    // },
+  /** when your routing map is too long, you can split it into small modules **/
+  // componentsRouter,
+  // chartsRouter,
+  // nestedRouter,
+  // tableRouter,
+  // cardRouter,
+  // couponRouter,
+  // {
+  //   path: '/example',
+  //   component: Layout,
+  //   redirect: '/example/list',
+  //   name: 'Example',
+  //   meta: {
+  //     title: 'Example',
+  //     icon: 'example'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'create',
+  //       component: () => import('@/views/example/create'),
+  //       name: 'CreateArticle',
+  //       meta: { title: 'Create Article', icon: 'edit' }
+  //     },
+  //     {
+  //       path: 'edit/:id(\\d+)',
+  //       component: () => import('@/views/example/edit'),
+  //       name: 'EditArticle',
+  //       meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
+  //       hidden: true
+  //     },
+  //     {
+  //       path: 'list',
+  //       component: () => import('@/views/example/list'),
+  //       name: 'ArticleList',
+  //       meta: { title: 'Article List', icon: 'list' }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: '/tab',
-    //   component: Layout,
-    //   children: [
-    //     {
-    //       path: 'index',
-    //       component: () => import('@/views/tab/index'),
-    //       name: 'Tab',
-    //       meta: { title: 'Tab', icon: 'tab' }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/tab',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/tab/index'),
+  //       name: 'Tab',
+  //       meta: { title: 'Tab', icon: 'tab' }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: '/error',
-    //   component: Layout,
-    //   redirect: 'noRedirect',
-    //   name: 'ErrorPages',
-    //   meta: {
-    //     title: 'Error Pages',
-    //     icon: '404'
-    //   },
-    //   children: [
-    //     {
-    //       path: '401',
-    //       component: () => import('@/views/error-page/401'),
-    //       name: 'Page401',
-    //       meta: { title: '401', noCache: true }
-    //     },
-    //     {
-    //       path: '404',
-    //       component: () => import('@/views/error-page/404'),
-    //       name: 'Page404',
-    //       meta: { title: '404', noCache: true }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/error',
+  //   component: Layout,
+  //   redirect: 'noRedirect',
+  //   name: 'ErrorPages',
+  //   meta: {
+  //     title: 'Error Pages',
+  //     icon: '404'
+  //   },
+  //   children: [
+  //     {
+  //       path: '401',
+  //       component: () => import('@/views/error-page/401'),
+  //       name: 'Page401',
+  //       meta: { title: '401', noCache: true }
+  //     },
+  //     {
+  //       path: '404',
+  //       component: () => import('@/views/error-page/404'),
+  //       name: 'Page404',
+  //       meta: { title: '404', noCache: true }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: '/error-log',
-    //   component: Layout,
-    //   children: [
-    //     {
-    //       path: 'log',
-    //       component: () => import('@/views/error-log/index'),
-    //       name: 'ErrorLog',
-    //       meta: { title: 'Error Log', icon: 'bug' }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/error-log',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'log',
+  //       component: () => import('@/views/error-log/index'),
+  //       name: 'ErrorLog',
+  //       meta: { title: 'Error Log', icon: 'bug' }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: '/excel',
-    //   component: Layout,
-    //   redirect: '/excel/export-excel',
-    //   name: 'Excel',
-    //   meta: {
-    //     title: 'Excel',
-    //     icon: 'excel'
-    //   },
-    //   children: [
-    //     {
-    //       path: 'export-excel',
-    //       component: () => import('@/views/excel/export-excel'),
-    //       name: 'ExportExcel',
-    //       meta: { title: 'Export Excel' }
-    //     },
-    //     {
-    //       path: 'export-selected-excel',
-    //       component: () => import('@/views/excel/select-excel'),
-    //       name: 'SelectExcel',
-    //       meta: { title: 'Export Selected' }
-    //     },
-    //     {
-    //       path: 'export-merge-header',
-    //       component: () => import('@/views/excel/merge-header'),
-    //       name: 'MergeHeader',
-    //       meta: { title: 'Merge Header' }
-    //     },
-    //     {
-    //       path: 'upload-excel',
-    //       component: () => import('@/views/excel/upload-excel'),
-    //       name: 'UploadExcel',
-    //       meta: { title: 'Upload Excel' }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/excel',
+  //   component: Layout,
+  //   redirect: '/excel/export-excel',
+  //   name: 'Excel',
+  //   meta: {
+  //     title: 'Excel',
+  //     icon: 'excel'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'export-excel',
+  //       component: () => import('@/views/excel/export-excel'),
+  //       name: 'ExportExcel',
+  //       meta: { title: 'Export Excel' }
+  //     },
+  //     {
+  //       path: 'export-selected-excel',
+  //       component: () => import('@/views/excel/select-excel'),
+  //       name: 'SelectExcel',
+  //       meta: { title: 'Export Selected' }
+  //     },
+  //     {
+  //       path: 'export-merge-header',
+  //       component: () => import('@/views/excel/merge-header'),
+  //       name: 'MergeHeader',
+  //       meta: { title: 'Merge Header' }
+  //     },
+  //     {
+  //       path: 'upload-excel',
+  //       component: () => import('@/views/excel/upload-excel'),
+  //       name: 'UploadExcel',
+  //       meta: { title: 'Upload Excel' }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: '/zip',
-    //   component: Layout,
-    //   redirect: '/zip/download',
-    //   alwaysShow: true,
-    //   name: 'Zip',
-    //   meta: { title: 'Zip', icon: 'zip' },
-    //   children: [
-    //     {
-    //       path: 'download',
-    //       component: () => import('@/views/zip/index'),
-    //       name: 'ExportZip',
-    //       meta: { title: 'Export Zip' }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/zip',
+  //   component: Layout,
+  //   redirect: '/zip/download',
+  //   alwaysShow: true,
+  //   name: 'Zip',
+  //   meta: { title: 'Zip', icon: 'zip' },
+  //   children: [
+  //     {
+  //       path: 'download',
+  //       component: () => import('@/views/zip/index'),
+  //       name: 'ExportZip',
+  //       meta: { title: 'Export Zip' }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: '/pdf',
-    //   component: Layout,
-    //   redirect: '/pdf/index',
-    //   children: [
-    //     {
-    //       path: 'index',
-    //       component: () => import('@/views/pdf/index'),
-    //       name: 'PDF',
-    //       meta: { title: 'PDF', icon: 'pdf' }
-    //     }
-    //   ]
-    // },
-    // {
-    //   path: '/pdf/download',
-    //   component: () => import('@/views/pdf/download'),
-    //   hidden: true
-    // },
+  // {
+  //   path: '/pdf',
+  //   component: Layout,
+  //   redirect: '/pdf/index',
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/pdf/index'),
+  //       name: 'PDF',
+  //       meta: { title: 'PDF', icon: 'pdf' }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/pdf/download',
+  //   component: () => import('@/views/pdf/download'),
+  //   hidden: true
+  // },
 
-    // {
-    //   path: '/theme',
-    //   component: Layout,
-    //   children: [
-    //     {
-    //       path: 'index',
-    //       component: () => import('@/views/theme/index'),
-    //       name: 'Theme',
-    //       meta: { title: 'Theme', icon: 'theme' }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/theme',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/theme/index'),
+  //       name: 'Theme',
+  //       meta: { title: 'Theme', icon: 'theme' }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: '/clipboard',
-    //   component: Layout,
-    //   children: [
-    //     {
-    //       path: 'index',
-    //       component: () => import('@/views/clipboard/index'),
-    //       name: 'ClipboardDemo',
-    //       meta: { title: 'Clipboard', icon: 'clipboard' }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: '/clipboard',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/clipboard/index'),
+  //       name: 'ClipboardDemo',
+  //       meta: { title: 'Clipboard', icon: 'clipboard' }
+  //     }
+  //   ]
+  // },
 
-    // {
-    //   path: 'external-link',
-    //   component: Layout,
-    //   children: [
-    //     {
-    //       path: 'https://github.com/PanJiaChen/vue-element-admin',
-    //       meta: { title: 'External Link', icon: 'link' }
-    //     }
-    //   ]
-    // },
+  // {
+  //   path: 'external-link',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'https://github.com/PanJiaChen/vue-element-admin',
+  //       meta: { title: 'External Link', icon: 'link' }
+  //     }
+  //   ]
+  // },
 
-    // 404 page must be placed at the end !!!
-    {
-        path: '*',
-        redirect: '/404',
-        hidden: true
-    }
+  // 404 page must be placed at the end !!!
+  {
+    path: '*',
+    redirect: '/404',
+    hidden: true
+  }
 ]
 
-const createRouter = () => new Router({
+const createRouter = () =>
+  new Router({
     // mode: 'history', // require service support
     scrollBehavior: () => ({
-        y: 0
+      y: 0
     }),
     routes: constantRoutes
-})
+  })
 
 const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-    const newRouter = createRouter()
-    router.matcher = newRouter.matcher // reset router
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher // reset router
 }
 
 export default router

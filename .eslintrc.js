@@ -55,7 +55,7 @@ module.exports = {
             'after': true
         }],
         'handle-callback-err': [2, '^(err|error)$'],
-        'indent': ["error", 4],
+        'indent': ["error", 2],
         'jsx-quotes': [2, 'prefer-single'],
         'key-spacing': [2, {
             'beforeColon': false,

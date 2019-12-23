@@ -107,52 +107,45 @@
 </template>
 
 <script>
-import {
-    getRoles,
-    addRole,
-    updateEnterprise,
-    deleteEnterprise
-} from '@/api/role'
+import { getRoles, addRole, updateRole, deleteRole } from '@/api/role'
 import waves from '@/directive/waves' // waves directive
-import { parseTime, deepClone } from '@/utils'
+import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-// import { listData } from './constant'
-// import patterns from '@/patterns'
 
 export default {
-    name: 'ComplexTable',
-    components: { Pagination },
-    directives: { waves },
-    filters: {
-        statusFilter(status) {
-            const statusMap = {
-                TRIAL: '试用',
-                试用: '',
-                NORMAL: '正常使用',
-                正常使用: 'success',
-                EXPIRED: '使用到期',
-                使用到期: 'warning',
-                DELETED: '禁用',
-                禁用: 'danger'
-            }
-            return statusMap[status]
-        },
-        timeFilter(time) {
-            return parseTime(time)
-        },
-        operateFilter(status) {
-            const statusMap = {
-                TRIAL: '禁用',
-                NORMAL: '禁用',
-                EXPIRED: '禁用',
-                DELETED: '启用',
-                禁用: 'danger',
-                启用: 'success'
-            }
-            return statusMap[status]
-        }
+  name: 'ComplexTable',
+  components: { Pagination },
+  directives: { waves },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        TRIAL: '试用',
+        试用: '',
+        NORMAL: '正常使用',
+        正常使用: 'success',
+        EXPIRED: '使用到期',
+        使用到期: 'warning',
+        DELETED: '禁用',
+        禁用: 'danger'
+      }
+      return statusMap[status]
     },
-    data() {
+    timeFilter(time) {
+      return parseTime(time)
+    },
+    operateFilter(status) {
+      const statusMap = {
+        TRIAL: '禁用',
+        NORMAL: '禁用',
+        EXPIRED: '禁用',
+        DELETED: '启用',
+        禁用: 'danger',
+        启用: 'success'
+      }
+      return statusMap[status]
+    }
+  },
+  data() {
     // const ownerValidate = (rule, value, callback) => {
     //   if (String(value).length < 3 || String(value).length > 16) {
     //     callback(new Error("联系人必须为3-16位"));
@@ -160,268 +153,243 @@ export default {
     //     callback();
     //   }
     // };
-        return {
-            tableKey: 0,
-            list: null,
-            total: 0,
-            listLoading: true,
-            listQuery: {
-                page: 1,
-                limit: 15,
-                name: undefined,
-                sort: '+id',
-                phone: undefined
-            },
-            importanceOptions: [1, 2, 3],
-            sortOptions: [
-                { label: 'ID Ascending', key: '+id' },
-                { label: 'ID Descending', key: '-id' }
-            ],
-            statusOptions: ['published', 'draft', 'deleted'],
-            showReviewer: false,
-            temp: {
-                name: ''
-            },
-            dialogFormVisible: false,
-            dialogStatus: '',
-            dialogPvVisible: false,
-            pvData: [],
-            rules: {
-                name: [{ required: true, message: '角色名称为必填', trigger: 'blur' }]
-            },
-            downloadLoading: false,
-            textMap: {
-                update: '编辑',
-                create: '新增'
-            },
-            typeStatus: '',
-            areaData: []
-        }
-    },
-    created() {
-        this.getList()
-    },
-    methods: {
-        getList() {
-            this.listLoading = true
-            getRoles().then(response => {
-                const data = response
-                const list = Array.isArray(data) ? data : []
-                this.list = list.slice()
-                const { name, phone, page, limit } = this.listQuery
-                if (name != null && name !== '') {
-                    this.list = this.list.filter(_ => {
-                        if (_.name.indexOf(name) >= 0) {
-                            return true
-                        }
-                        return false
-                    })
-                }
-                if (phone != null && phone !== '') {
-                    this.list = this.list.filter(_ => {
-                        if (_.ownerPhone.indexOf(phone) >= 0) {
-                            return true
-                        }
-                        return false
-                    })
-                }
-                this.total = this.list.length
-                this.list = this.list.slice((page - 1) * limit, page * limit)
-                this.listLoading = false
-            })
-        },
-        handleFilter() {
-            this.listQuery.page = 1
-            this.getList()
-        },
-        sortChange(data) {
-            const { prop, order } = data
-            if (prop === 'id') {
-                this.sortByID(order)
-            }
-        },
-        sortByID(order) {
-            if (order === 'ascending') {
-                this.listQuery.sort = '+id'
-            } else {
-                this.listQuery.sort = '-id'
-            }
-            this.handleFilter()
-        },
-        resetTemp() {
-            this.temp = {
-                name: ''
-            }
-        },
-        createData() {
-            this.$refs['dataForm'].validate(valid => {
-                if (valid) {
-                    addRole(Object.assign(this.temp, { id: 1 })).then(response => {
-                        this.dialogFormVisible = false
-                        this.getList()
-                        this.$notify({
-                            title: 'Success',
-                            message: '新增成功',
-                            type: 'success',
-                            duration: 2000
-                        })
-                    })
-                }
-            })
-        },
-        handleUpdate(row) {
-            this.dialogStatus = 'update'
-            this.temp = Object.assign({}, row) // copy obj
-            const fullAddressLike = {
-                0: this.temp.province,
-                1: this.temp.city,
-                2: this.temp.district,
-                length: 3
-            }
-            const fullAddressArray = Array.from(fullAddressLike)
-            const hasEmpty = fullAddressArray.some(_ => !_)
-            this.temp.fullAddress = hasEmpty ? [] : fullAddressArray
-            this.dialogFormVisible = true
-            this.$nextTick(() => {
-                this.$refs['dataForm'].clearValidate()
-                // const parent = document.getElementsByTagName("body")[0];
-                // const childNodes = Array.from(parent.childNodes);
-                // const node = childNodes.filter(
-                //   node => node.className === "el-popper el-cascader__dropdown"
-                // );
-                // if (node.length) {
-                //   parent.removeChild(node[0]);
-                // }
-            })
-        },
-        updateData() {
-            this.$refs['dataForm'].validate(valid => {
-                if (valid) {
-                    const params = Object.assign({}, this.temp)
-                    const fullAddress = deepClone(params.fullAddress)
-                    delete params.fullAddress
-                    params.province = fullAddress[0] || ''
-                    params.city = fullAddress[1] || ''
-                    params.district = fullAddress[2] || ''
-                    updateEnterprise(params).then(() => {
-                        // for (const v of this.list) {
-                        //   if (v.id === this.temp.id) {
-                        //     const index = this.list.indexOf(v);
-                        //     this.list.splice(index, 1, this.temp);
-                        //     break;
-                        //   }
-                        // }
-                        this.dialogFormVisible = false
-                        this.getList()
-                        this.$notify({
-                            title: 'Success',
-                            message: '更新成功',
-                            type: 'success',
-                            duration: 2000
-                        })
-                    })
-                }
-            })
-        },
-        handleDownload() {
-            this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = [
-              '商家名称',
-              '联系人',
-              '联系人手机号',
-              '注册时间',
-              '到期时间',
-              '状态'
-          ]
-          const filterVal = [
-              'name',
-              'owner',
-              'ownerPhone',
-              'createdAt',
-              'createdAt',
-              'status'
-          ]
-          const data = this.formatJson(filterVal, this.list)
-          excel.export_json_to_excel({
-              header: tHeader,
-              data,
-              filename: '商家列表'
-          })
-          this.downloadLoading = false
-      })
-        },
-        formatJson(filterVal, jsonData) {
-            return jsonData.map(v =>
-                filterVal.map(j => {
-                    if (j === 'createdAt') {
-                        return parseTime(v[j])
-                    } else if (j === 'status') {
-                        return this.$options.filters.statusFilter(v[j])
-                    } else {
-                        return v[j]
-                    }
-                })
-            )
-        },
-        getSortClass: function(key) {
-            const sort = this.listQuery.sort
-            return sort === `+${key}`
-                ? 'ascending'
-                : sort === `-${key}`
-                    ? 'descending'
-                    : ''
-        },
-        handleAdd() {
-            this.dialogFormVisible = true
-            this.dialogStatus = 'create'
-            this.resetTemp()
-        },
-        beforeClose(done) {
-            this.$refs['dataForm'].resetFields()
-        },
-        handleDelete(row) {
-            this.$confirm('此操作将禁用该商家, 是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            })
-                .then(() => {
-                    deleteEnterprise(row.id).then(response => {
-                        this.getList()
-                        this.$notify({
-                            title: '成功',
-                            message: '禁用成功',
-                            type: 'success',
-                            duration: 2000
-                        })
-                    })
-                })
-                .catch(() => {
-                    this.$notify({
-                        title: '失败',
-                        message: '已取消禁用',
-                        type: 'warning',
-                        duration: 2000
-                    })
-                })
-        },
-        showUpdateBtn(status) {
-            const statusMap = {
-                TRIAL: true,
-                NORMAL: true,
-                EXPIRED: true,
-                DELETED: false
-            }
-            return statusMap[status]
-        },
-        handlePagination(val) {
-            const { page, limit } = val
-            this.listQuery.page = page
-            this.listQuery.limit = limit
-            this.getList()
-        }
+    return {
+      tableKey: 0,
+      list: null,
+      total: 0,
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 15,
+        name: undefined,
+        sort: '+id',
+        phone: undefined
+      },
+      importanceOptions: [1, 2, 3],
+      sortOptions: [
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
+      ],
+      statusOptions: ['published', 'draft', 'deleted'],
+      showReviewer: false,
+      temp: {
+        name: ''
+      },
+      dialogFormVisible: false,
+      dialogStatus: '',
+      dialogPvVisible: false,
+      pvData: [],
+      rules: {
+        name: [{ required: true, message: '角色名称为必填', trigger: 'blur' }]
+      },
+      downloadLoading: false,
+      textMap: {
+        update: '编辑',
+        create: '新增'
+      },
+      typeStatus: '',
+      areaData: []
     }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    getList() {
+      this.listLoading = true
+      getRoles().then(response => {
+        const data = response
+        const list = Array.isArray(data) ? data : []
+        this.list = list.slice()
+        const { name, phone, page, limit } = this.listQuery
+        if (name != null && name !== '') {
+          this.list = this.list.filter(_ => {
+            if (_.name.indexOf(name) >= 0) {
+              return true
+            }
+            return false
+          })
+        }
+        if (phone != null && phone !== '') {
+          this.list = this.list.filter(_ => {
+            if (_.ownerPhone.indexOf(phone) >= 0) {
+              return true
+            }
+            return false
+          })
+        }
+        this.total = this.list.length
+        this.list = this.list.slice((page - 1) * limit, page * limit)
+        this.listLoading = false
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
+      }
+    },
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    resetTemp() {
+      this.temp = {
+        name: ''
+      }
+    },
+    createData() {
+      this.$refs['dataForm'].validate(valid => {
+        if (valid) {
+          addRole(Object.assign(this.temp, { id: 1 })).then(response => {
+            this.dialogFormVisible = false
+            this.getList()
+            this.$notify({
+              title: 'Success',
+              message: '新增成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleUpdate(row) {
+      this.dialogStatus = 'update'
+      this.temp = Object.assign({}, row) // copy obj
+      delete this.temp.createdAt
+      delete this.temp.updatedAt
+      delete this.temp.sys
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    updateData() {
+      this.$refs['dataForm'].validate(valid => {
+        if (valid) {
+          const params = Object.assign({}, this.temp)
+          updateRole(params).then(() => {
+            this.dialogFormVisible = false
+            this.getList()
+            this.$notify({
+              title: 'Success',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = [
+          '商家名称',
+          '联系人',
+          '联系人手机号',
+          '注册时间',
+          '到期时间',
+          '状态'
+        ]
+        const filterVal = [
+          'name',
+          'owner',
+          'ownerPhone',
+          'createdAt',
+          'createdAt',
+          'status'
+        ]
+        const data = this.formatJson(filterVal, this.list)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: '商家列表'
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v =>
+        filterVal.map(j => {
+          if (j === 'createdAt') {
+            return parseTime(v[j])
+          } else if (j === 'status') {
+            return this.$options.filters.statusFilter(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}`
+        ? 'ascending'
+        : sort === `-${key}`
+          ? 'descending'
+          : ''
+    },
+    handleAdd() {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'create'
+      this.resetTemp()
+    },
+    beforeClose(done) {
+      this.$refs['dataForm'].resetFields()
+    },
+    handleDelete(row) {
+      console.log(row, 'row')
+      this.$confirm('此操作将删除该角色, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          deleteRole(row.id).then(response => {
+            this.getList()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        })
+        .catch(() => {
+          this.$notify({
+            title: '失败',
+            message: '已取消删除',
+            type: 'warning',
+            duration: 2000
+          })
+        })
+    },
+    showUpdateBtn(status) {
+      const statusMap = {
+        TRIAL: true,
+        NORMAL: true,
+        EXPIRED: true,
+        DELETED: false
+      }
+      return statusMap[status]
+    },
+    handlePagination(val) {
+      const { page, limit } = val
+      this.listQuery.page = page
+      this.listQuery.limit = limit
+      this.getList()
+    }
+  }
 }
 </script>
 

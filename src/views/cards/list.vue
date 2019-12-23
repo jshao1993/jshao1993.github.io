@@ -71,7 +71,7 @@
           <span>{{ scope.row.sid }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="充值金额（元）" width="150px" align="center">
+      <el-table-column label="剩余金额（元）" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.money }}</span>
         </template>
@@ -90,9 +90,10 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="120" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="135" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
           <el-button type="warning" size="mini" @click="handleUpdate(row)">编辑</el-button>
+          <el-button v-if="row.status === 'NORMAL'" type="success" size="mini" @click="handleDeposit(row)">充值</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -169,6 +170,38 @@
         >确定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      title="充值"
+      :visible.sync="dialogDepositVisible"
+      :close-on-click-modal="false"
+      width="520px"
+      :before-close="handleDepositClose"
+    >
+      <el-form
+        ref="dataDepositForm"
+        :rules="depositRules"
+        :model="depositTemp"
+        label-position="right"
+        label-width="120px"
+        style="width: 410px; margin-left:20px;"
+      >
+        <el-form-item label="充值金额" prop="deposit">
+          <el-input
+            v-model="depositTemp.deposit"
+            clearable
+            placeholder="请输入充值金额"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeDepositDialog">关闭</el-button>
+        <el-button
+          type="primary"
+          @click="handleDepositSure"
+        >充值</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -180,7 +213,8 @@ import {
   startCard,
   stopCard,
   updateCard,
-  fetchCard
+  fetchCard,
+  depositCard
 } from '@/api/card'
 import waves from '@/directive/waves' // waves directive
 import { parseTime, deepClone } from '@/utils'
@@ -238,11 +272,29 @@ export default {
         customerPhone: '',
         money: ''
       },
+      depositTemp: {
+        memberShipId: undefined,
+        deposit: 0
+      },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '新增'
+      },
+      depositRules: {
+        deposit: [
+          {
+            required: true,
+            message: '充值金额为必填',
+            trigger: 'blur'
+          },
+          {
+            pattern: patterns.positiveNumber,
+            message: '请输入正确的金额',
+            trigger: 'blur'
+          }
+        ]
       },
       rules: {
         type: [
@@ -297,7 +349,8 @@ export default {
       currentCid: '',
       creditedCideTemp: '',
       timedCideTemp: '',
-      cardObj: null
+      cardObj: null,
+      dialogDepositVisible: false
     }
   },
   computed: {
@@ -366,6 +419,12 @@ export default {
         customerName: '',
         customerPhone: '',
         money: ''
+      }
+    },
+    resetDepositTemp() {
+      this.depositTemp = {
+        memberShipId: undefined,
+        deposit: 0
       }
     },
     handleCreate() {
@@ -523,10 +582,20 @@ export default {
       this.$refs['dataForm'].clearValidate()
       done()
     },
+    handleDepositClose(done) {
+      this.resetDepositTemp()
+      this.$refs['dataDepositForm'].clearValidate()
+      done()
+    },
     closeDialog() {
       this.resetTemp()
       this.$refs['dataForm'].clearValidate()
       this.dialogFormVisible = false
+    },
+    closeDepositDialog() {
+      this.resetDepositTemp()
+      this.$refs['dataDepositForm'].clearValidate()
+      this.dialogDepositVisible = false
     },
     getConfigType() {
       const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
@@ -546,6 +615,30 @@ export default {
       this.temp.type === 'TIMED'
         ? (this.timedCideTemp = currentVal)
         : (this.creditedCideTemp = currentVal)
+    },
+    handleDeposit(row) {
+      const { id } = row
+      this.depositTemp.memberShipId = id
+      this.dialogDepositVisible = true
+    },
+    handleDepositSure() {
+      this.$refs['dataDepositForm'].validate(valid => {
+        if (valid) {
+          const temp = Object.assign({}, this.depositTemp)
+          depositCard(temp).then(response => {
+            this.resetDepositTemp()
+            this.$refs['dataDepositForm'].clearValidate()
+            this.dialogDepositVisible = false
+            this.getList()
+            this.$notify({
+              title: 'Success',
+              message: '充值成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
     }
   }
 }

@@ -217,11 +217,11 @@
 
 <script>
 import {
-    fetchList,
-    addUser,
-    deleteUser,
-    updateUser,
-    avatar
+  fetchList,
+  addUser,
+  deleteUser,
+  updateUser,
+  avatar
 } from '@/api/system'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -232,308 +232,308 @@ import Password from 'vue-password-strength-meter'
 import defaultAvatar from '@/assets/error_default_avatar/default_avatar.png'
 
 export default {
-    name: 'ComplexTable',
-    components: { Pagination, Password },
-    directives: { waves },
-    filters: {
-        timeFilter(time) {
-            return parseTime(time)
-        }
-    },
-    data() {
-        const validatePassword = (rule, value, callback) => {
-            if (!value) {
-                callback(new Error('密码为必填'))
-            } else if (value.length < 8) {
-                callback(new Error('密码不能少于8位'))
-            } else {
-                callback()
-            }
-        }
-        return {
-            tableKey: 0,
-            list: null,
-            total: 0,
-            listLoading: true,
-            listQuery: {
-                pageNum: 1,
-                pageSize: 15,
-                name: undefined
-            },
-            importanceOptions: [1, 2, 3],
-            sortOptions: [
-                { label: 'ID Ascending', key: '+id' },
-                { label: 'ID Descending', key: '-id' }
-            ],
-            statusOptions: ['published', 'draft', 'deleted'],
-            showReviewer: false,
-            temp: {
-                username: '',
-                nickName: '',
-                phone: '',
-                email: '',
-                avatar: '',
-                password: ''
-            },
-            dialogFormVisible: false,
-            dialogStatus: '',
-            typeStatus: '',
-            dialogPvVisible: false,
-            pvData: [],
-            rules: {
-                username: [
-                    { required: true, message: '用户名为必填', trigger: 'blur' }
-                ],
-                password: [
-                    { required: true, validator: validatePassword, trigger: 'blur' }
-                ],
-                nickName: [
-                    { required: true, message: '真实姓名为必填', trigger: 'blur' }
-                ],
-                phone: [
-                    { required: true, message: '联系电话为必填', trigger: 'blur' },
-                    {
-                        pattern: patterns.mobile,
-                        message: '请输入正确的联系电话',
-                        trigger: 'blur'
-                    }
-                ],
-                email: [
-                    { required: true, message: '邮箱为必填', trigger: 'blur' },
-                    {
-                        pattern: patterns.email,
-                        message: '请输入正确的邮箱',
-                        trigger: 'blur'
-                    }
-                ],
-                avatar: [{ required: true, message: '头像为必传', trigger: 'change' }]
-                // money: [
-                //   { required: true, message: "充值金额为必填", trigger: "blur" },
-                //   {
-                //     pattern: patterns.positiveNumber,
-                //     message: "请输入正确的金额",
-                //     trigger: "blur"
-                //   }
-                // ]
-            },
-            downloadLoading: false,
-            textMap: {
-                update: '编辑',
-                create: '新增'
-            },
-            baseUrl: process.env.VUE_APP_STATIC_BASE_URL,
-            avatar,
-            passwordType: 'text',
-            passwordShow: false,
-            uploadAvatar: ''
-        }
-    },
-    created() {
-        this.getList()
-    },
-    methods: {
-        getList(queryObj) {
-            if (typeof queryObj === 'object') {
-                const { page = 1, limit = 15 } = queryObj
-                this.listQuery.pageNum = page
-                this.listQuery.pageSize = limit
-            }
-            this.listLoading = true
-            fetchList(this.listQuery).then(response => {
-                this.total = response.total || 0
-                this.list = Array.isArray(response.records) ? response.records : []
-                this.listLoading = false
-            })
-        },
-        handleFilter() {
-            this.listQuery.pageNum = 1
-            this.getList()
-        },
-        sortChange(data) {
-            const { prop, order } = data
-            if (prop === 'id') {
-                this.sortByID(order)
-            }
-        },
-        sortByID(order) {
-            if (order === 'ascending') {
-                this.listQuery.sort = '+id'
-            } else {
-                this.listQuery.sort = '-id'
-            }
-            this.handleFilter()
-        },
-        resetTemp() {
-            this.temp = {
-                username: '',
-                nickName: '',
-                phone: '',
-                email: '',
-                avatar: '',
-                password: ''
-            }
-            this.uploadAvatar = ''
-        },
-        createData() {
-            this.$refs['dataForm'].validate(valid => {
-                if (valid) {
-                    addUser(this.temp).then(() => {
-                        this.dialogFormVisible = false
-                        this.getList()
-                        this.$notify({
-                            title: 'Success',
-                            message: '新增成功',
-                            type: 'success',
-                            duration: 2000
-                        })
-                    })
-                }
-            })
-        },
-        handleUpdate(row) {
-            this.temp = Object.assign({}, row) // copy obj
-            this.uploadAvatar = this.baseUrl + this.temp.avatar
-            this.dialogStatus = 'update'
-            this.dialogFormVisible = true
-            this.$nextTick(() => {
-                this.$refs['dataForm'].clearValidate()
-            })
-        },
-        updateData() {
-            this.$refs['dataForm'].validate(valid => {
-                if (valid) {
-                    const { id, nickName, avatar } = this.temp
-                    const tempData = Object.assign({}, { userId: id, nickName, avatar })
-                    updateUser(tempData).then(() => {
-                        this.dialogFormVisible = false
-                        this.getList()
-                        this.$notify({
-                            title: 'Success',
-                            message: '更新成功',
-                            type: 'success',
-                            duration: 2000
-                        })
-                    })
-                }
-            })
-        },
-        handleDownload() {
-            this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = [
-              '用户名',
-              '真实姓名',
-              '联系电话',
-              '邮箱',
-              '注册时间',
-              '最新一次更新时间'
-          ]
-          const filterVal = [
-              'username',
-              'nickName',
-              'phone',
-              'email',
-              'createdAt',
-              'updatedAt'
-          ]
-          const data = this.formatJson(filterVal, this.list)
-          excel.export_json_to_excel({
-              header: tHeader,
-              data,
-              filename: '用户列表'
-          })
-          this.downloadLoading = false
-      })
-        },
-        formatJson(filterVal, jsonData) {
-            return jsonData.map(v =>
-                filterVal.map(j => {
-                    if (j === 'createdAt' || j === 'updatedAt') {
-                        return parseTime(v[j])
-                    } else {
-                        return v[j]
-                    }
-                })
-            )
-        },
-        getSortClass: function(key) {
-            const sort = this.listQuery.sort
-            return sort === `+${key}`
-                ? 'ascending'
-                : sort === `-${key}`
-                    ? 'descending'
-                    : ''
-        },
-        handleAdd() {
-            this.dialogFormVisible = true
-            this.dialogStatus = 'create'
-            this.resetTemp()
-            this.$nextTick(() => {
-                this.$refs['dataForm'].clearValidate()
-            })
-        },
-        beforeClose(done) {
-            this.$refs['dataForm'].resetFields()
-        },
-        imgLoadError(ev) {
-            const img = ev.srcElement
-            img.src = defaultAvatar
-            img.onerror = null // 防止闪图
-        },
-        handleAvatarSuccess(res, file) {
-            this.uploadAvatar = URL.createObjectURL(file.raw)
-            this.temp.avatar = res.data.path
-        },
-        beforeAvatarUpload(file) {
-            const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
-            const isLt2M = file.size / 1024 / 1024 < 0.5
-
-            if (!isJPG) {
-                this.$message.error('上传头像图片只能是 JPG/PNG 格式!')
-            }
-            if (!isLt2M) {
-                this.$message.error('上传头像图片大小不能超过 500kb!')
-            }
-            return isJPG && isLt2M
-        },
-        handlePwdFocus() {
-            this.passwordType = 'password'
-            this.passwordShow = true
-        },
-        createSubmit() {
-            this.passwordType = 'text'
-            this.passwordShow = false
-            this.$nextTick(() => {
-                this.$refs['submitRef'].click()
-            })
-        },
-        handleDelete(row) {
-            this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            })
-                .then(() => {
-                    deleteUser(row.id).then(response => {
-                        this.getList()
-                        this.$notify({
-                            title: '成功',
-                            message: '删除成功',
-                            type: 'success',
-                            duration: 2000
-                        })
-                    })
-                })
-                .catch(() => {
-                    this.$notify({
-                        title: '取消',
-                        message: '已取消删除',
-                        type: 'warning',
-                        duration: 2000
-                    })
-                })
-        }
+  name: 'ComplexTable',
+  components: { Pagination, Password },
+  directives: { waves },
+  filters: {
+    timeFilter(time) {
+      return parseTime(time)
     }
+  },
+  data() {
+    const validatePassword = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('密码为必填'))
+      } else if (value.length < 8) {
+        callback(new Error('密码不能少于8位'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      tableKey: 0,
+      list: null,
+      total: 0,
+      listLoading: true,
+      listQuery: {
+        pageNum: 1,
+        pageSize: 15,
+        name: undefined
+      },
+      importanceOptions: [1, 2, 3],
+      sortOptions: [
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
+      ],
+      statusOptions: ['published', 'draft', 'deleted'],
+      showReviewer: false,
+      temp: {
+        username: '',
+        nickName: '',
+        phone: '',
+        email: '',
+        avatar: '',
+        password: ''
+      },
+      dialogFormVisible: false,
+      dialogStatus: '',
+      typeStatus: '',
+      dialogPvVisible: false,
+      pvData: [],
+      rules: {
+        username: [
+          { required: true, message: '用户名为必填', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, validator: validatePassword, trigger: 'blur' }
+        ],
+        nickName: [
+          { required: true, message: '真实姓名为必填', trigger: 'blur' }
+        ],
+        phone: [
+          { required: true, message: '联系电话为必填', trigger: 'blur' },
+          {
+            pattern: patterns.mobile,
+            message: '请输入正确的联系电话',
+            trigger: 'blur'
+          }
+        ],
+        email: [
+          { required: true, message: '邮箱为必填', trigger: 'blur' },
+          {
+            pattern: patterns.email,
+            message: '请输入正确的邮箱',
+            trigger: 'blur'
+          }
+        ],
+        avatar: [{ required: true, message: '头像为必传', trigger: 'change' }]
+        // money: [
+        //   { required: true, message: "充值金额为必填", trigger: "blur" },
+        //   {
+        //     pattern: patterns.positiveNumber,
+        //     message: "请输入正确的金额",
+        //     trigger: "blur"
+        //   }
+        // ]
+      },
+      downloadLoading: false,
+      textMap: {
+        update: '编辑',
+        create: '新增'
+      },
+      baseUrl: process.env.VUE_APP_STATIC_BASE_URL,
+      avatar,
+      passwordType: 'text',
+      passwordShow: false,
+      uploadAvatar: ''
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    getList(queryObj) {
+      if (typeof queryObj === 'object') {
+        const { page = 1, limit = 15 } = queryObj
+        this.listQuery.pageNum = page
+        this.listQuery.pageSize = limit
+      }
+      this.listLoading = true
+      fetchList(this.listQuery).then(response => {
+        this.total = response.total || 0
+        this.list = Array.isArray(response.records) ? response.records : []
+        this.listLoading = false
+      })
+    },
+    handleFilter() {
+      this.listQuery.pageNum = 1
+      this.getList()
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
+      }
+    },
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    resetTemp() {
+      this.temp = {
+        username: '',
+        nickName: '',
+        phone: '',
+        email: '',
+        avatar: '',
+        password: ''
+      }
+      this.uploadAvatar = ''
+    },
+    createData() {
+      this.$refs['dataForm'].validate(valid => {
+        if (valid) {
+          addUser(this.temp).then(() => {
+            this.dialogFormVisible = false
+            this.getList()
+            this.$notify({
+              title: 'Success',
+              message: '新增成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleUpdate(row) {
+      this.temp = Object.assign({}, row) // copy obj
+      this.uploadAvatar = this.baseUrl + this.temp.avatar
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    updateData() {
+      this.$refs['dataForm'].validate(valid => {
+        if (valid) {
+          const { id, nickName, avatar } = this.temp
+          const tempData = Object.assign({}, { userId: id, nickName, avatar })
+          updateUser(tempData).then(() => {
+            this.dialogFormVisible = false
+            this.getList()
+            this.$notify({
+              title: 'Success',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = [
+          '用户名',
+          '真实姓名',
+          '联系电话',
+          '邮箱',
+          '注册时间',
+          '最新一次更新时间'
+        ]
+        const filterVal = [
+          'username',
+          'nickName',
+          'phone',
+          'email',
+          'createdAt',
+          'updatedAt'
+        ]
+        const data = this.formatJson(filterVal, this.list)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: '用户列表'
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v =>
+        filterVal.map(j => {
+          if (j === 'createdAt' || j === 'updatedAt') {
+            return parseTime(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}`
+        ? 'ascending'
+        : sort === `-${key}`
+          ? 'descending'
+          : ''
+    },
+    handleAdd() {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'create'
+      this.resetTemp()
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    beforeClose(done) {
+      this.$refs['dataForm'].resetFields()
+    },
+    imgLoadError(ev) {
+      const img = ev.srcElement
+      img.src = defaultAvatar
+      img.onerror = null // 防止闪图
+    },
+    handleAvatarSuccess(res, file) {
+      this.uploadAvatar = URL.createObjectURL(file.raw)
+      this.temp.avatar = res.data.path
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+      const isLt2M = file.size / 1024 / 1024 < 0.5
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG/PNG 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 500kb!')
+      }
+      return isJPG && isLt2M
+    },
+    handlePwdFocus() {
+      this.passwordType = 'password'
+      this.passwordShow = true
+    },
+    createSubmit() {
+      this.passwordType = 'text'
+      this.passwordShow = false
+      this.$nextTick(() => {
+        this.$refs['submitRef'].click()
+      })
+    },
+    handleDelete(row) {
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          deleteUser(row.id).then(response => {
+            this.getList()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        })
+        .catch(() => {
+          this.$notify({
+            title: '取消',
+            message: '已取消删除',
+            type: 'warning',
+            duration: 2000
+          })
+        })
+    }
+  }
 }
 </script>
 

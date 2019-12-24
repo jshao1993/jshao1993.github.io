@@ -141,192 +141,193 @@ import Pagination from '@/components/Pagination' // secondary package based on e
 import patterns from '@/patterns'
 
 const typeOptions = [
-    { key: 'DEPOSIT', display_name: '充值' },
-    { key: 'PURCHASE', display_name: '消费' }
+  { key: 'DEPOSIT', display_name: '充值' },
+  { key: 'PURCHASE', display_name: '消费' }
 ]
 
 const typeKeyValue = typeOptions.reduce((acc, cur) => {
-    acc[cur.key] = cur.display_name
-    return acc
+  acc[cur.key] = cur.display_name
+  return acc
 }, {})
 
 export default {
-    name: 'ConsumeRecords',
-    components: { Pagination },
-    directives: { waves },
-    filters: {
-        typeFilter(type) {
-            return typeKeyValue[type]
-        }
-    },
-    data() {
-        return {
-            tableKey: 0,
-            list: null,
-            total: 0,
-            listLoading: true,
-            listQuery: {
-                pageNum: 1,
-                pageSize: 20,
-                phone: undefined,
-                type: ''
-            },
-            typeOptions,
-            temp: {
-                data: undefined,
-                name: '',
-                type: '',
-                mobile: '',
-                amount: '',
-                number: undefined
-            },
-            dialogFormVisible: false,
-            dialogStatus: '',
-            textMap: {
-                update: '编辑',
-                create: '新增'
-            },
-            typeStatus: '',
-            typeMap: {
-                recharge: '充值卡优惠类型',
-                time: '时间会员卡类型'
-            },
-            dialogPvVisible: false,
-            rules: {
-                type: [
-                    {
-                        required: true,
-                        message: '会员卡类型为必选',
-                        trigger: 'change'
-                    }
-                ],
-                name: [
-                    {
-                        required: true,
-                        message: '会员姓名为必填',
-                        trigger: 'blur'
-                    }
-                ],
-                mobile: [
-                    {
-                        required: true,
-                        message: '会员手机号码为必填',
-                        trigger: 'blur'
-                    },
-                    {
-                        pattern: patterns.mobile,
-                        message: '请输入正确的手机号码',
-                        trigger: 'blur'
-                    }
-                ],
-                amount: [
-                    {
-                        required: true,
-                        message: '充值金额为必填',
-                        trigger: 'blur'
-                    },
-                    {
-                        pattern: patterns.positiveNumber,
-                        message: '请输入正确的金额',
-                        trigger: 'blur'
-                    }
-                ]
-            },
-            downloadLoading: false
-        }
-    },
-    computed: {
-        enterprise() {
-            return this.$store.getters.enterprise
-        }
-    },
-    created() {
-        this.getList()
-    },
-    methods: {
-        getList() {
-            this.listLoading = true
-            const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
-            this.listQuery.eid = ep[0].eid
-            fetchList(this.listQuery).then(response => {
-                if (response && Array.isArray(response.records)) {
-                    this.list = response.records.filter(
-                        _ => !!~_.type.indexOf(this.listQuery.type)
-                    )
-                }
-                this.listLoading = false
-            })
-        },
-        handleFilter() {
-            this.listQuery.page = 1
-            this.getList()
-        },
-        sortChange(data) {
-            const { prop, order } = data
-            if (prop === 'id') {
-                this.sortByID(order)
-            }
-        },
-        sortByID(order) {
-            if (order === 'ascending') {
-                this.listQuery.sort = '+id'
-            } else {
-                this.listQuery.sort = '-id'
-            }
-            this.handleFilter()
-        },
-        handleDownload() {
-            this.downloadLoading = true
-            import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = [
-                    '顾客名称',
-                    '顾客手机号',
-                    '会员卡id',
-                    '会员卡名称',
-                    '消费时间',
-                    '消费或充值金额（元）',
-                    '消费类型'
-                ]
-                const filterVal = [
-                    'customerName',
-                    'customerPhone',
-                    'memberShipId',
-                    'memberShipName',
-                    'consumeTime',
-                    'money',
-                    'type'
-                ]
-                const data = this.formatJson(filterVal, this.list)
-                excel.export_json_to_excel({
-                    header: tHeader,
-                    data,
-                    filename: '消费记录'
-                })
-                this.downloadLoading = false
-            })
-        },
-        formatJson(filterVal, jsonData) {
-            return jsonData.map(v =>
-                filterVal.map(j => {
-                    if (j === 'consumeTime') {
-                        return parseTime(v[j], '{y}-{m}-{d} {h}:{i}')
-                    } else if (j === 'type') {
-                        return typeKeyValue[v[j]]
-                    } else {
-                        return v[j]
-                    }
-                })
-            )
-        },
-        getSortClass: function(key) {
-            const sort = this.listQuery.sort
-            return sort === `+${key}`
-                ? 'ascending'
-                : sort === `-${key}`
-                    ? 'descending'
-                    : ''
-        }
+  name: 'ConsumeRecords',
+  components: { Pagination },
+  directives: { waves },
+  filters: {
+    typeFilter(type) {
+      return typeKeyValue[type]
     }
+  },
+  data() {
+    return {
+      tableKey: 0,
+      list: null,
+      total: 0,
+      listLoading: true,
+      listQuery: {
+        pageNum: 1,
+        pageSize: 20,
+        phone: undefined,
+        type: ''
+      },
+      typeOptions,
+      temp: {
+        data: undefined,
+        name: '',
+        type: '',
+        mobile: '',
+        amount: '',
+        number: undefined
+      },
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: '编辑',
+        create: '新增'
+      },
+      typeStatus: '',
+      typeMap: {
+        recharge: '充值卡优惠类型',
+        time: '时间会员卡类型'
+      },
+      dialogPvVisible: false,
+      rules: {
+        type: [
+          {
+            required: true,
+            message: '会员卡类型为必选',
+            trigger: 'change'
+          }
+        ],
+        name: [
+          {
+            required: true,
+            message: '会员姓名为必填',
+            trigger: 'blur'
+          }
+        ],
+        mobile: [
+          {
+            required: true,
+            message: '会员手机号码为必填',
+            trigger: 'blur'
+          },
+          {
+            pattern: patterns.mobile,
+            message: '请输入正确的手机号码',
+            trigger: 'blur'
+          }
+        ],
+        amount: [
+          {
+            required: true,
+            message: '充值金额为必填',
+            trigger: 'blur'
+          },
+          {
+            pattern: patterns.positiveNumber,
+            message: '请输入正确的金额',
+            trigger: 'blur'
+          }
+        ]
+      },
+      downloadLoading: false
+    }
+  },
+  computed: {
+    enterprise() {
+      return this.$store.getters.enterprise
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    getList() {
+      this.listLoading = true
+      const ep = this.enterprise.filter(_ => _.name === '李宝的店铺')
+      this.listQuery.eid = ep[0].eid
+      fetchList(this.listQuery).then(response => {
+        if (response && Array.isArray(response.records)) {
+          this.list = response.records.filter(
+            _ => !!~_.type.indexOf(this.listQuery.type)
+          )
+        }
+        this.total = response.total
+        this.listLoading = false
+      })
+    },
+    handleFilter() {
+      this.listQuery.pageNum = 1
+      this.getList()
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
+      }
+    },
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    handleDownload() {
+      this.downloadLoading = true
+            import('@/vendor/Export2Excel').then(excel => {
+              const tHeader = [
+                '顾客名称',
+                '顾客手机号',
+                '会员卡id',
+                '会员卡名称',
+                '消费时间',
+                '消费或充值金额（元）',
+                '消费类型'
+              ]
+              const filterVal = [
+                'customerName',
+                'customerPhone',
+                'memberShipId',
+                'memberShipName',
+                'consumeTime',
+                'money',
+                'type'
+              ]
+              const data = this.formatJson(filterVal, this.list)
+              excel.export_json_to_excel({
+                header: tHeader,
+                data,
+                filename: '消费记录'
+              })
+              this.downloadLoading = false
+            })
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v =>
+        filterVal.map(j => {
+          if (j === 'consumeTime') {
+            return parseTime(v[j], '{y}-{m}-{d} {h}:{i}')
+          } else if (j === 'type') {
+            return typeKeyValue[v[j]]
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}`
+        ? 'ascending'
+        : sort === `-${key}`
+          ? 'descending'
+          : ''
+    }
+  }
 }
 </script>
 
